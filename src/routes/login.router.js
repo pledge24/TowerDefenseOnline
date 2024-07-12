@@ -1,22 +1,21 @@
 import express from 'express';
-import { prisma } from '../utils/prisma/index.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import configs from '../utils/configs.js';
 import { config } from '../config/config.js';
+import { findUserByUserID } from '../db/user/user.db.js';
 
 const router = express.Router();
 
 // 로그인 API
-router.post('/login', async (req, res, next) => {
+router.post('/', async (req, res, next) => {
   try {
-    const { id, password } = req.body;
+    const { username, password } = req.body;
 
-    if (!id || !password) {
+    if (!username || !password) {
       return res.status(400).json({ errorMessage: '입력 값이 잘못되었습니다.' });
     }
 
-    if (!/^[a-zA-Z0-9]{1,10}$/.test(id)) {
+    if (!/^[a-zA-Z0-9]{1,10}$/.test(username)) {
       return res
         .status(400)
         .json({ errorMessage: '아이디는 영문과 숫자로 이루어진 1~10자 길이의 문자열만 허용됩니다.' });
@@ -25,7 +24,7 @@ router.post('/login', async (req, res, next) => {
     if (password.length < 2) {
       return res.status(400).json({ errorMessage: '비밀번호는 2글자 이상이어야 합니다.' });
     }
-    const user = findUserByUserID(id);
+    const user = await findUserByUserID(username);
 
     if (!user) {
       return res.status(404).json({ errorMessage: '존재하지 않는 아이디입니다.' });
@@ -38,17 +37,13 @@ router.post('/login', async (req, res, next) => {
 
     const token = jwt.sign(
       {
-        id,
+        username,
       },
       config.token.tokenSecretKey,
       { expiresIn: '12h' }
     );
-
-    localStorage.setItem("token", `Bearer ${token}`);
-
-    return res.status(200).json({
-      message: '로그인이 완료되었습니다.',
-    });
+    const data = { token: `bearer ${token}` };
+    return res.status(200).json(data);
   } catch (err) {
     return res.status(500).json({ errorMessage: '서버 내부 에러가 발생했습니다.' });
   }
@@ -70,12 +65,11 @@ router.get('/auth', async (req, res, next) => {
       throw new Error('토큰 타입이 일치하지 않습니다.');
     }
 
-    const decodedToken = jwt.verify(token, configs.tokenSecretKey);
-    const id = decodedToken.id;
+    const decodedToken = jwt.verify(token, config.token.tokenSecretKey);
+    const username = decodedToken.username;
 
-    const user = await prisma.user.findUnique({
-      where: { id },
-    });
+    const user = findUserByUserID(username);
+
     if (!user) {
       res.clearCookie('authorization');
       throw new Error('토큰 사용자가 존재하지 않습니다.');
