@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS User
 
 CREATE TABLE IF NOT EXISTS UserInfo
 (
-    User_id VARCHAR(36) NOT NULL,
+    user_id VARCHAR(36) NOT NULL,
     highscore INT,
     win INT,
     lose INT,
