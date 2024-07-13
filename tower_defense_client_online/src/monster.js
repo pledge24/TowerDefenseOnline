@@ -44,6 +44,7 @@ export class Monster {
       return false;
     } else {
       this.hp = 0; // 몬스터는 이제 기지를 공격했으므로 자연스럽게 소멸해야 합니다.
+      
       return true;
     }
   }
