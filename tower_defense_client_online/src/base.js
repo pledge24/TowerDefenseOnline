@@ -9,6 +9,10 @@ export class Base {
     this.maxHp = maxHp; // 기지의 최대 HP
   }
 
+  updateBaseHp(baseHp) {
+    this.hp = baseHp;
+  }
+
   draw(ctx, baseImage, isOpponent = false) {
     ctx.drawImage(
       baseImage,
@@ -23,7 +27,7 @@ export class Base {
       ctx.fillStyle = "white";
       ctx.fillText(
         `HP: ${this.hp}/${this.maxHp}`,
-        this.x - this.width,
+        this.x - this.width - 5,
         this.y - this.height / 2 - 10
       );
     }
