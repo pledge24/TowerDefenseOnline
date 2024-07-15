@@ -10,18 +10,18 @@ class Path {
 
     path.push({ x: currentX, y: currentY });
 
-    while (currentX < canvas.width) {
+    while (currentX < canvas.width-60) {
       currentX += Math.floor(Math.random() * 100) + 50; // 50 ~ 150 범위의 x 증가
-      if (currentX > canvas.width) {
-        currentX = canvas.width;
+      if (currentX > canvas.width-60) {
+        currentX = canvas.width-60;
       }
 
       currentY += Math.floor(Math.random() * 200) - 100; // -100 ~ 100 범위의 y 변경
-      if (currentY < 0) {
-        currentY = 0;
+      if (currentY < 30) {
+        currentY = 30;
       }
-      if (currentY > canvas.height) {
-        currentY = canvas.height;
+      if (currentY > canvas.height-30) {
+        currentY = canvas.height-30;
       }
 
       path.push({ x: currentX, y: currentY });
