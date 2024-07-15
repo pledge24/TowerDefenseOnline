@@ -1,10 +1,8 @@
-import { addSpawnedMonster, notifySpawnedMonster } from './game/monster.handler.js';
-import { towerAttackHandler } from './game/towerAttack.handler.js';
+// import { addSpawnedMonster, notifySpawnedMonster } from "./game/monster.handler.js";
 
 const handlerMapping = {
-  8: addSpawnedMonster,
-  9: notifySpawnedMonster,
-  10: towerAttackHandler,
+  // 8: addSpawnedMonster,
+  // 9: notifySpawnedMonster
 };
 
 export default handlerMapping;

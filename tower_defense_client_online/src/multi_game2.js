@@ -25,20 +25,20 @@ const loader = document.getElementsByClassName('loader')[0];
 const NUM_OF_MONSTERS = 5; // 몬스터 개수
 // 게임 데이터
 let towerCost = 0; // 타워 구입 비용
-let monsterSpawnInterval = 0; // 몬스터 생성 주기
+let monsterSpawnInterval = 1000; // 몬스터 생성 주기
 
 // 유저 데이터
-let userGold = 0; // 유저 골드
-let base; // 기지 객체
-let baseHp = 0; // 기지 체력
-let monsterLevel = 0; // 몬스터 레벨
-let monsterPath; // 몬스터 경로
-let initialTowerCoords; // 초기 타워 좌표
-let basePosition; // 기지 좌표
-const monsters = []; // 유저 몬스터 목록
-const towers = []; // 유저 타워 목록
-let score = 0; // 게임 점수
-let highScore = 0; // 기존 최고 점수
+let userGold = 0;               // 유저 골드
+let base;                       // 기지 객체
+let baseHp = 100;                 // 기지 체력
+let monsterLevel = 0;           // 몬스터 레벨
+let monsterPath;                // 몬스터 경로
+let initialTowerCoords;         // 초기 타워 좌표
+let basePosition;               // 기지 좌표
+const monsters = [];            // 유저 몬스터 목록
+const towers = [];              // 유저 타워 목록
+let score = 0;                  // 게임 점수
+let highScore = 0;              // 기존 최고 점수
 
 // 상대 데이터
 let opponentBase; // 상대방 기지 객체
@@ -168,11 +168,9 @@ function placeBase(position, isPlayer) {
 }
 
 function spawnMonster() {
-  const newMonster = new Monster(monsterPath, monsterImages, monsterLevel);
-  monsters.push(newMonster);
-
   // TODO. 서버로 몬스터 생성 이벤트 전송
-  // serverSocket.sendEvent(8, {monsterNumber: newMonster.monsterNumber})
+  const monsterNumber = Math.floor(Math.random() * monsterImages.length);
+  serverSocket.emit("spawnMonster", {monsterNumber})
 }
 
 function gameLoop() {
@@ -214,6 +212,7 @@ function gameLoop() {
   for (let i = monsters.length - 1; i >= 0; i--) {
     const monster = monsters[i];
     if (monster.hp > 0) {
+      monster.draw(ctx);  // 몬스터 그리기
       const Attacked = monster.move();
       if (Attacked) {
         const attackedSound = new Audio('sounds/attacked.wav');
@@ -262,6 +261,12 @@ function initGame(myData, opponentData) {
   console.log('monsterPath', monsterPath);
   console.log('opponentMonsterPath', opponentMonsterPath);
 
+  basePosition = monsterPath[monsterPath.length - 1];
+  opponentBasePosition = opponentMonsterPath[opponentMonsterPath.length - 1];
+
+  console.log("basePosition", basePosition);
+  console.log("opponentBasePosition", opponentBasePosition);
+
   initialTowerCoords = myData[2].data;
   opponentInitialTowerCoords = opponentData[2].data;
 
@@ -283,20 +288,16 @@ Promise.all([
   new Promise((resolve) => (pathImage.onload = resolve)),
   ...monsterImages.map((img) => new Promise((resolve) => (img.onload = resolve))),
 ]).then(() => {
-  console.log('check1');
-  serverSocket = io('http://127.0.0.1:3000', {
+  serverSocket = io("http://127.0.0.1:3000", {
     auth: {
-      token: localStorage.getItem('token2'),
-      //token: "user2"
+     token: localStorage.getItem("token2"),
     },
   });
-  console.log('serverSocket', serverSocket);
-  console.log('check2', localStorage.getItem('token2'));
-
-  serverSocket.on('connect_error', (err) => {
-    if (err.message === 'Authentication error') {
-      alert('잘못된 토큰입니다.');
-      location.href = '/login';
+  
+  serverSocket.on("connect_error", (err) => {
+    if (err.message === "Authentication error") {
+      alert("잘못된 토큰입니다.");
+      location.href = "/login";
     }
   });
 
@@ -337,7 +338,21 @@ Promise.all([
     }, 300);
   });
 
-  serverSocket.on('gameOver', (data) => {
+  // 내 몬스터 스폰 이벤트 수신
+  serverSocket.on('spawnMonster', (monster) => {
+    const newMonster = new Monster(monsterPath, monsterImages, monster.level, monster.monsterNumber);
+    monsters.push(newMonster);
+    // console.log("multi_game2(me): monster spawned!");
+  });
+
+  // 상대 몬스터 스폰 이벤트 수신
+  serverSocket.on('spawnOpponentMonster', (monster) => {
+    // console.log("opponent(multi_game2) spawned monster");
+    const newMonster = new Monster(opponentMonsterPath, monsterImages, monster.level, monster.monsterNumber);
+    opponentMonsters.push(newMonster);
+  });
+
+  serverSocket.on("gameOver", (data) => {
     bgm.pause();
     const { isWin } = data;
     const winSound = new Audio('sounds/win.wav');
