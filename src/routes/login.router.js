@@ -42,7 +42,8 @@ router.post('/', async (req, res, next) => {
       config.token.tokenSecretKey,
       { expiresIn: '12h' }
     );
-    const data = { token: `bearer ${token}` };
+    const data = { token: `Bearer ${token}` };
+    console.log("data.token", data.token);
     return res.status(200).json(data);
   } catch (err) {
     return res.status(500).json({ errorMessage: '서버 내부 에러가 발생했습니다.' });

@@ -1,5 +1,5 @@
 import express from 'express';
-import initServer from './handler/init/index.js';
+import initServer from './init/index.js';
 import { config } from './config/config.js';
 import { createServer } from 'http';
 import loginRouter from './routes/login.router.js';
@@ -18,7 +18,7 @@ app.get('/', (req, res) => {
   return res.status(200).json({ message: 'Hello World!' });
 });
 
-initServer()
+initServer(server)
   .then(() => {
     server.listen(config.server.port, config.server.host, () => {
       console.log(`서버가 ${config.server.host}:${config.server.port}에서 열렸습니다`);

@@ -15,3 +15,8 @@ export const createUser = async (userId, password) => {
 export const updateUserLogin = async (userId) => {
   await pools.TOWER_DEFENSE_ONLINE_DB.query(SQL_QUERIES.UPDATE_USER_LOGIN, [userId]);
 };
+
+export const getUserHighScore = async (userId) => {
+  const [rows] = await pools.TOWER_DEFENSE_ONLINE_DB.query(SQL_QUERIES.GET_USER_HIGHSCORE, [userId]);
+  return rows[0].highscore || 0;
+};
