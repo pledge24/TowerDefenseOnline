@@ -28,17 +28,17 @@ let towerCost = 0; // 타워 구입 비용
 let monsterSpawnInterval = 1000; // 몬스터 생성 주기
 
 // 유저 데이터
-let userGold = 0;               // 유저 골드
-let base;                       // 기지 객체
-let baseHp = 100;                 // 기지 체력
-let monsterLevel = 0;           // 몬스터 레벨
-let monsterPath;                // 몬스터 경로
-let initialTowerCoords;         // 초기 타워 좌표
-let basePosition;               // 기지 좌표
-const monsters = [];            // 유저 몬스터 목록
-const towers = [];              // 유저 타워 목록
-let score = 0;                  // 게임 점수
-let highScore = 0;              // 기존 최고 점수
+let userGold = 0; // 유저 골드
+let base; // 기지 객체
+let baseHp = 100; // 기지 체력
+let monsterLevel = 0; // 몬스터 레벨
+let monsterPath; // 몬스터 경로
+let initialTowerCoords; // 초기 타워 좌표
+let basePosition; // 기지 좌표
+const monsters = []; // 유저 몬스터 목록
+const towers = []; // 유저 타워 목록
+let score = 0; // 게임 점수
+let highScore = 0; // 기존 최고 점수
 
 // 상대 데이터
 let opponentBase; // 상대방 기지 객체
@@ -79,8 +79,8 @@ function initMap() {
   drawPath(opponentMonsterPath, opponentCtx);
   placeInitialTowers(initialTowerCoords, towers, ctx); // 초기 타워 배치
   placeInitialTowers(opponentInitialTowerCoords, opponentTowers, opponentCtx); // 상대방 초기 타워 배치
-  // placeBase(basePosition, true);
-  // placeBase(opponentBasePosition, false);
+  placeBase(basePosition, true);
+  placeBase(opponentBasePosition, false);
 }
 
 function drawPath(path, context) {
@@ -170,7 +170,7 @@ function placeBase(position, isPlayer) {
 function spawnMonster() {
   // TODO. 서버로 몬스터 생성 이벤트 전송
   const monsterNumber = Math.floor(Math.random() * monsterImages.length);
-  serverSocket.emit("spawnMonster", {monsterNumber})
+  serverSocket.emit('spawnMonster', { monsterNumber });
 }
 
 function gameLoop() {
@@ -189,30 +189,25 @@ function gameLoop() {
   ctx.fillText(`현재 레벨: ${monsterLevel}`, 100, 200); // 최고 기록 표시
 
   // 타워 그리기 및 몬스터 공격 처리
-  towers.forEach((tower) => {
+  towers.forEach((tower, towerIndex) => {
     tower.draw(ctx, towerImage);
     tower.updateCooldown();
-    monsters.forEach((monster) => {
+    monsters.forEach((monster, monsterIndex) => {
       const distance = Math.sqrt(Math.pow(tower.x - monster.x, 2) + Math.pow(tower.y - monster.y, 2));
-      if (distance < tower.range) {
+      if (distance < tower.range && tower.cooldown === 0) {
         tower.attack(monster);
-        serverSocket.emit('event', {
-          handlerId: 10,
-          userId: 'test',
-          clientVersion: CLIENT_VERSION,
-          payload: { tower, monster },
-        });
+        serverSocket.emit('towerAttack', { tower, towerIndex, monsterIndex });
       }
     });
   });
 
   // 몬스터가 공격을 했을 수 있으므로 기지 다시 그리기
-  // base.draw(ctx, baseImage);
+  base.draw(ctx, baseImage);
 
   for (let i = monsters.length - 1; i >= 0; i--) {
     const monster = monsters[i];
     if (monster.hp > 0) {
-      monster.draw(ctx);  // 몬스터 그리기
+      monster.draw(ctx); // 몬스터 그리기
       const Attacked = monster.move();
       if (Attacked) {
         const attackedSound = new Audio('sounds/attacked.wav');
@@ -241,7 +236,7 @@ function gameLoop() {
     monster.draw(opponentCtx, true);
   });
 
-  // opponentBase.draw(opponentCtx, baseImage, true);
+  opponentBase.draw(opponentCtx, baseImage, true);
 
   requestAnimationFrame(gameLoop); // 지속적으로 다음 프레임에 gameLoop 함수 호출할 수 있도록 함
 }
@@ -264,8 +259,8 @@ function initGame(myData, opponentData) {
   basePosition = monsterPath[monsterPath.length - 1];
   opponentBasePosition = opponentMonsterPath[opponentMonsterPath.length - 1];
 
-  console.log("basePosition", basePosition);
-  console.log("opponentBasePosition", opponentBasePosition);
+  console.log('basePosition', basePosition);
+  console.log('opponentBasePosition', opponentBasePosition);
 
   initialTowerCoords = myData[2].data;
   opponentInitialTowerCoords = opponentData[2].data;
@@ -288,16 +283,16 @@ Promise.all([
   new Promise((resolve) => (pathImage.onload = resolve)),
   ...monsterImages.map((img) => new Promise((resolve) => (img.onload = resolve))),
 ]).then(() => {
-  serverSocket = io("http://127.0.0.1:3000", {
+  serverSocket = io('http://127.0.0.1:3000', {
     auth: {
-     token: localStorage.getItem("token2"),
+      token: localStorage.getItem('token2'),
     },
   });
-  
-  serverSocket.on("connect_error", (err) => {
-    if (err.message === "Authentication error") {
-      alert("잘못된 토큰입니다.");
-      location.href = "/login";
+
+  serverSocket.on('connect_error', (err) => {
+    if (err.message === 'Authentication error') {
+      alert('잘못된 토큰입니다.');
+      location.href = '/login';
     }
   });
 
@@ -352,7 +347,21 @@ Promise.all([
     opponentMonsters.push(newMonster);
   });
 
-  serverSocket.on("gameOver", (data) => {
+  // 내 타워가 몬스터 공격했을 때 이벤트
+  serverSocket.on('decreaseMonsterHp', (data) => {
+    const { monsterIndex, monsterHp } = data;
+    monsters[monsterIndex].hp = monsterHp;
+    console.log(monsters[monsterIndex].hp);
+  });
+
+  // 상대 타워가 몬스터 공격했을 때 이벤트
+  serverSocket.on('decreaseOpponentMonsterHp', (data) => {
+    const { monsterIndex, monsterHp, towerIndex } = data;
+    opponentTowers[towerIndex].attack(opponentMonsters[monsterIndex]);
+    opponentMonsters[monsterIndex].hp = monsterHp;
+  });
+
+  serverSocket.on('gameOver', (data) => {
     bgm.pause();
     const { isWin } = data;
     const winSound = new Audio('sounds/win.wav');

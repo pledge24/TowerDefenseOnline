@@ -34,8 +34,10 @@ class Monsters {
     this.data.slice(monsterIdx, 1);
   }
 
-  getMonster(monsterNumber) {
-    return this.data.forEach((m) => m.monsterNumber === monsterNumber);
+  decreaseMonsterHp(index, tower) {
+    const monster = this.data[index]
+    monster.hp -= tower.attackPower;
+    return monster.hp;
   }
 }
 
