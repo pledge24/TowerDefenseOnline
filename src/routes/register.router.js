@@ -28,7 +28,7 @@ router.post('/', async (req, res, next) => {
     }
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    console.log(hashedPassword);
+    console.log("hashedPassword", hashedPassword);
     // 유저 생성
     const user = await createUser(username, hashedPassword);
     return res.status(201).json({ message: '회원가입이 완료되었습니다.' });
