@@ -2,18 +2,16 @@ import { Base } from "./base.js";
 import { Monster } from "./monster.js";
 import { Tower } from "./tower.js";
 
-if (!localStorage.getItem("token2")) {
+if (!localStorage.getItem("token")) {
   alert("로그인이 필요합니다.");
   location.href = "/login";
 }
 
 let serverSocket;
-let canvas = document.getElementById("gameCanvas");
-canvas.height = 500;
+const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
-let opponentCanvas = document.getElementById("opponentCanvas");
-opponentCanvas.height = 500;
+const opponentCanvas = document.getElementById("opponentCanvas");
 const opponentCtx = opponentCanvas.getContext("2d");
 
 const progressBarContainer = document.getElementById("progressBarContainer");
@@ -73,7 +71,6 @@ let bgm;
 
 function initMap() {
   ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height); // 배경 이미지 그리기
-  opponentCtx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height); // 배경 이미지 그리기
   drawPath(monsterPath, ctx);
   drawPath(opponentMonsterPath, opponentCtx);
   placeInitialTowers(initialTowerCoords, towers, ctx); // 초기 타워 배치
@@ -256,7 +253,7 @@ function gameLoop() {
   requestAnimationFrame(gameLoop); // 지속적으로 다음 프레임에 gameLoop 함수 호출할 수 있도록 함
 }
 
-function initGame(myData, opponentData) {
+function initGame() {
   if (isInitGame) {
     return;
   }
@@ -264,18 +261,6 @@ function initGame(myData, opponentData) {
   bgm.loop = true;
   bgm.volume = 0.2;
   bgm.play();
-
-  monsterPath = myData[1].data;
-  opponentMonsterPath = opponentData[1].data;
-
-  console.log("monsterPath", monsterPath);
-  console.log("opponentMonsterPath", opponentMonsterPath);
-
-  initialTowerCoords = myData[2].data;
-  opponentInitialTowerCoords = opponentData[2].data;
-
-  console.log("initialTowerCoords",  initialTowerCoords);
-  console.log("opponentInitialTowerCoords",  opponentInitialTowerCoords);
 
   initMap(); // 맵 초기화 (배경, 몬스터 경로 그리기)
 
@@ -294,81 +279,75 @@ Promise.all([
     (img) => new Promise((resolve) => (img.onload = resolve))
   ),
 ]).then(() => {
-  console.log("check1");
-  serverSocket = io("http://127.0.0.1:3000", {
-    auth: {
-     token: localStorage.getItem("token2"),
-     //token: "user2"
-    },
-  });
-  console.log("serverSocket", serverSocket);
-  console.log("check2", localStorage.getItem("token2"));
-  
-  serverSocket.on("connect_error", (err) => {
-    if (err.message === "Authentication error") {
-      alert("잘못된 토큰입니다.");
-      location.href = "/login";
-    }
-  });
+  // serverSocket = io("http://15.165.15.118:3000", {
+  //   auth: {
+  //     token: localStorage.getItem("token"),
+  //   },
+  // });
 
-  serverSocket.on("connect", () => {
-    // TODO. 서버와 연결되면 대결 대기열 큐 진입
-    console.log("um");
-    serverSocket.emit("joinMatchQueue", {width: canvas.width, height: canvas.height})
-  });
+  // serverSocket.on("connect_error", (err) => {
+  //   if (err.message === "Authentication error") {
+  //     alert("잘못된 토큰입니다.");
+  //     location.href = "/login";
+  //   }
+  // });
 
-  serverSocket.on("matchFound", (data) => {
-    console.log("okokok", data);
-    const myData = data.user2_data;
-    const opponentData = data.user1_data;
+  // serverSocket.on("connect", () => {
+  //   // TODO. 서버와 연결되면 대결 대기열 큐 진입
+  // });
 
-    // 상대가 매치되면 3초 뒤 게임 시작
-    progressBarMessage.textContent = "게임이 3초 뒤에 시작됩니다.";
+  // serverSocket.on("matchFound", (data) => {
+  //   // 상대가 매치되면 3초 뒤 게임 시작
+  //   progressBarMessage.textContent = "게임이 3초 뒤에 시작됩니다.";
 
-    let progressValue = 0;
-    const progressInterval = setInterval(() => {
-      progressValue += 10;
-      progressBar.value = progressValue;
-      progressBar.style.display = "block";
-      loader.style.display = "none";
+  //   let progressValue = 0;
+  //   const progressInterval = setInterval(() => {
+  //     progressValue += 10;
+  //     progressBar.value = progressValue;
+  //     progressBar.style.display = "block";
+  //     loader.style.display = "none";
 
-      if (progressValue >= 100) {
-        clearInterval(progressInterval);
-        progressBarContainer.style.display = "none";
-        progressBar.style.display = "none";
-        buyTowerButton.style.display = "block";
-        canvas.style.display = "block";
-        opponentCanvas.style.display = "block";
+  //     if (progressValue >= 100) {
+  //       clearInterval(progressInterval);
+  //       progressBarContainer.style.display = "none";
+  //       progressBar.style.display = "none";
+  //       buyTowerButton.style.display = "block";
+  //       canvas.style.display = "block";
+  //       opponentCanvas.style.display = "block";
 
-        // TODO. 유저 및 상대방 유저 데이터 초기화
-        if (!isInitGame) {
-          initGame(myData, opponentData);
+  //       // TODO. 유저 및 상대방 유저 데이터 초기화
+  //       if (!isInitGame) {
+  //         initGame();
+  //       }
+  //     }
+  //   }, 300);
+  // });
+
+  // serverSocket.on("gameOver", (data) => {
+  //   bgm.pause();
+  //   const { isWin } = data;
+  //   const winSound = new Audio("sounds/win.wav");
+  //   const loseSound = new Audio("sounds/lose.wav");
+  //   winSound.volume = 0.3;
+  //   loseSound.volume = 0.3;
+  //   if (isWin) {
+  //     winSound.play().then(() => {
+  //       alert("당신이 게임에서 승리했습니다!");
+  //       // TODO. 게임 종료 이벤트 전송
+  //       location.reload();
+  //     });
+  //   } else {
+  //     loseSound.play().then(() => {
+  //       alert("아쉽지만 대결에서 패배하셨습니다! 다음 대결에서는 꼭 이기세요!");
+  //       // TODO. 게임 종료 이벤트 전송
+  //       location.reload();
+  //     });
+  //   }
+  // });
+
+          if (!isInitGame) {
+          initGame();
         }
-      }
-    }, 300);
-  });
-
-  serverSocket.on("gameOver", (data) => {
-    bgm.pause();
-    const { isWin } = data;
-    const winSound = new Audio("sounds/win.wav");
-    const loseSound = new Audio("sounds/lose.wav");
-    winSound.volume = 0.3;
-    loseSound.volume = 0.3;
-    if (isWin) {
-      winSound.play().then(() => {
-        alert("당신이 게임에서 승리했습니다!");
-        // TODO. 게임 종료 이벤트 전송
-        location.reload();
-      });
-    } else {
-      loseSound.play().then(() => {
-        alert("아쉽지만 대결에서 패배하셨습니다! 다음 대결에서는 꼭 이기세요!");
-        // TODO. 게임 종료 이벤트 전송
-        location.reload();
-      });
-    }
-  });
 });
 
 const buyTowerButton = document.createElement("button");

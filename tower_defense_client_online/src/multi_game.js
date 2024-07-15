@@ -8,10 +8,12 @@ if (!localStorage.getItem("token")) {
 }
 
 let serverSocket;
-const canvas = document.getElementById("gameCanvas");
+let canvas = document.getElementById("gameCanvas");
+canvas.height = 500;
 const ctx = canvas.getContext("2d");
 
-const opponentCanvas = document.getElementById("opponentCanvas");
+let opponentCanvas = document.getElementById("opponentCanvas");
+opponentCanvas.height = 500;
 const opponentCtx = opponentCanvas.getContext("2d");
 
 const progressBarContainer = document.getElementById("progressBarContainer");
@@ -25,25 +27,25 @@ let towerCost = 0; // 타워 구입 비용
 let monsterSpawnInterval = 0; // 몬스터 생성 주기
 
 // 유저 데이터
-let userGold = 0; // 유저 골드
-let base; // 기지 객체
-let baseHp = 0; // 기지 체력
-let monsterLevel = 0; // 몬스터 레벨
-let monsterPath; // 몬스터 경로
-let initialTowerCoords; // 초기 타워 좌표
-let basePosition; // 기지 좌표
-const monsters = []; // 유저 몬스터 목록
-const towers = []; // 유저 타워 목록
-let score = 0; // 게임 점수
-let highScore = 0; // 기존 최고 점수
+let userGold = 0;               // 유저 골드
+let base;                       // 기지 객체
+let baseHp = 0;                 // 기지 체력
+let monsterLevel = 0;           // 몬스터 레벨
+let monsterPath;                // 몬스터 경로
+let initialTowerCoords;         // 초기 타워 좌표
+let basePosition;               // 기지 좌표
+const monsters = [];            // 유저 몬스터 목록
+const towers = [];              // 유저 타워 목록
+let score = 0;                  // 게임 점수
+let highScore = 0;              // 기존 최고 점수
 
 // 상대 데이터
-let opponentBase; // 상대방 기지 객체
-let opponentMonsterPath; // 상대방 몬스터 경로
+let opponentBase;               // 상대방 기지 객체
+let opponentMonsterPath;        // 상대방 몬스터 경로
 let opponentInitialTowerCoords; // 상대방 초기 타워 좌표
-let opponentBasePosition; // 상대방 기지 좌표
-const opponentMonsters = []; // 상대방 몬스터 목록
-const opponentTowers = []; // 상대방 타워 목록
+let opponentBasePosition;       // 상대방 기지 좌표
+const opponentMonsters = [];    // 상대방 몬스터 목록
+const opponentTowers = [];      // 상대방 타워 목록
 
 let isInitGame = false;
 
@@ -177,7 +179,7 @@ function spawnMonster() {
   monsters.push(newMonster);
 
   // TODO. 서버로 몬스터 생성 이벤트 전송
-  
+  serverSocket.sendEvent(8, {monsterNumber: newMonster.monsterNumber})
 }
 
 function gameLoop() {
@@ -254,7 +256,7 @@ function gameLoop() {
   requestAnimationFrame(gameLoop); // 지속적으로 다음 프레임에 gameLoop 함수 호출할 수 있도록 함
 }
 
-function initGame() {
+function initGame(myData, opponentData) {
   if (isInitGame) {
     return;
   }
@@ -262,6 +264,18 @@ function initGame() {
   bgm.loop = true;
   bgm.volume = 0.2;
   bgm.play();
+
+  monsterPath = myData[1].data;
+  opponentMonsterPath = opponentData[1].data;
+
+  console.log("monsterPath", monsterPath);
+  console.log("opponentMonsterPath", opponentMonsterPath);
+
+  initialTowerCoords = myData[2].data;
+  opponentInitialTowerCoords = opponentData[2].data;
+
+  console.log("initialTowerCoords",  initialTowerCoords);
+  console.log("opponentInitialTowerCoords",  opponentInitialTowerCoords);
 
   initMap(); // 맵 초기화 (배경, 몬스터 경로 그리기)
 
@@ -280,12 +294,16 @@ Promise.all([
     (img) => new Promise((resolve) => (img.onload = resolve))
   ),
 ]).then(() => {
-  serverSocket = io("http://15.165.15.118:3000", {
+  console.log("check1");
+  serverSocket = io("http://127.0.0.1:3000", {
     auth: {
-      token: localStorage.getItem("token"),
+     token: localStorage.getItem("token"),
+     //token: "user2"
     },
   });
-
+  console.log("serverSocket", serverSocket);
+  console.log("check2", localStorage.getItem("token"));
+  
   serverSocket.on("connect_error", (err) => {
     if (err.message === "Authentication error") {
       alert("잘못된 토큰입니다.");
@@ -295,9 +313,15 @@ Promise.all([
 
   serverSocket.on("connect", () => {
     // TODO. 서버와 연결되면 대결 대기열 큐 진입
+    console.log("um");
+    serverSocket.emit("joinMatchQueue", {width: canvas.width, height: canvas.height})
   });
 
   serverSocket.on("matchFound", (data) => {
+    console.log("okokok", data);
+    const myData = data.user1_data;
+    const opponentData = data.user2_data;
+
     // 상대가 매치되면 3초 뒤 게임 시작
     progressBarMessage.textContent = "게임이 3초 뒤에 시작됩니다.";
 
@@ -318,7 +342,7 @@ Promise.all([
 
         // TODO. 유저 및 상대방 유저 데이터 초기화
         if (!isInitGame) {
-          initGame();
+          initGame(myData, opponentData);
         }
       }
     }, 300);
