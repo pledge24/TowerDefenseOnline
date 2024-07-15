@@ -14,7 +14,7 @@ class Base {
   };
 
   // 베이스 체력 가져오기
-  egetBaseHp = (userId) => {
+  getBaseHp = (userId) => {
     return userBase[userId];
   };
 

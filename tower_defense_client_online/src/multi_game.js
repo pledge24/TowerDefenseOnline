@@ -294,15 +294,15 @@ Promise.all([
     (img) => new Promise((resolve) => (img.onload = resolve))
   ),
 ]).then(() => {
-  console.log("check1");
+  //console.log("check1");
   serverSocket = io("http://127.0.0.1:3000", {
     auth: {
      token: localStorage.getItem("token"),
      //token: "user2"
     },
   });
-  console.log("serverSocket", serverSocket);
-  console.log("check2", localStorage.getItem("token"));
+  //console.log("serverSocket", serverSocket);
+  //console.log("check2", localStorage.getItem("token"));
   
   serverSocket.on("connect_error", (err) => {
     if (err.message === "Authentication error") {
