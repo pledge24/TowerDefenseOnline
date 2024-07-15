@@ -170,6 +170,7 @@ function placeNewTower() {
   tower.draw(ctx, towerImage);
 }
 
+// 나의기지 및 상대기지 위치보정
 function placeBase(position, isPlayer) {
   if (isPlayer) {
     base = new Base(baseX, position.y, baseHp);
