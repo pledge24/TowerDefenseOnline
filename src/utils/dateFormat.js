@@ -1,4 +1,4 @@
-function getFormatDate(date) {
+export const getFormatDate = (date) => {
   var year = date.getFullYear();
   var month = 1 + date.getMonth();
   month = month > 10 ? month : '0' + month;
@@ -12,4 +12,4 @@ function getFormatDate(date) {
   seconds = seconds > 10 ? seconds : '0' + seconds;
 
   return `${year}-${month}-${day} ${hours}:${minutes}:${seconds} `;
-}
+};

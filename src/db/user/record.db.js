@@ -9,5 +9,5 @@ export const findRecordByUserID = async (userId) => {
 
 export const createRecord = async (data) => {
   await pools.TOWER_DEFENSE_ONLINE_DB.query(SQL_QUERIES.CREATE_RECORD, data);
-  return { player1_id, player2_id, player1_score, player2_score, win, start_time };
+  return data;
 };

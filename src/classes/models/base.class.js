@@ -4,24 +4,20 @@ class Base {
   }
 
   // 게임 시작 시 베이스 체력 초기화
-  initializeBase = (userId) => {
-    userBase[userId] = BASE_MAX_HP;
+  initializeBase = (initHp) => {
+    this.baseHp = initHp;
   };
 
   // 베이스 체력 설정
-  setBaseHp = (userId, baseHp) => {
-    userBase[userId] = baseHp;
+  setBaseHp = (changeHp) => {
+    this.baseHp = changeHp;
   };
 
   // 베이스 체력 가져오기
-  getBaseHp = (userId) => {
-    return userBase[userId];
+  getBaseHp = () => {
+    return this.baseHp;
   };
 
-  // 베이스 정보 삭제
-  removeBase = (userId) => {
-    delete userBase.userId;
-  };
 }
 
 export default Base;

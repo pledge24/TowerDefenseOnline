@@ -13,7 +13,7 @@ export class Monster {
     this.y = path[0].y; // 몬스터의 y 좌표 (최초 위치는 경로의 첫 번째 지점)
     this.width = 40; // 몬스터 이미지 가로 길이
     this.height = 40; // 몬스터 이미지 세로 길이
-    this.speed = 2; // 몬스터의 이동 속도
+    this.speed = 5; // 몬스터의 이동 속도
     this.image = monsterImages[this.monsterNumber]; // 몬스터 이미지
     this.level = level; // 몬스터 레벨
     this.init(level);
@@ -25,7 +25,7 @@ export class Monster {
     this.attackPower = 10 + 1 * level; // 몬스터의 공격력 (기지에 가해지는 데미지)
   }
 
-  move() {
+  move(base) {
     if (this.currentIndex < this.path.length - 1) {
       const nextPoint = this.path[this.currentIndex + 1];
       const deltaX = nextPoint.x - this.x;
@@ -44,6 +44,7 @@ export class Monster {
       return false;
     } else {
       this.hp = 0; // 몬스터는 이제 기지를 공격했으므로 자연스럽게 소멸해야 합니다.
+      
       return true;
     }
   }
