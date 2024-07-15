@@ -217,7 +217,7 @@ function gameLoop() {
       }
     } else {
       // TODO. 몬스터 사망 이벤트 전송
-      monsters.splice(i, 1);
+      serverSocket.emit('monsterKill', i);
     }
   }
 
@@ -350,7 +350,6 @@ Promise.all([
   serverSocket.on('decreaseMonsterHp', (data) => {
     const { monsterIndex, monsterHp } = data;
     monsters[monsterIndex].hp = monsterHp;
-    console.log(monsters[monsterIndex].hp);
   });
 
   // 상대 타워가 몬스터 공격했을 때 이벤트
@@ -358,6 +357,18 @@ Promise.all([
     const { monsterIndex, monsterHp, towerIndex } = data;
     opponentTowers[towerIndex].attack(opponentMonsters[monsterIndex]);
     opponentMonsters[monsterIndex].hp = monsterHp;
+  });
+
+  // 내 몬스터 처치 시 이벤트
+  serverSocket.on('monsterKill', (data) => {
+    const monsterIndex = data;
+    monsters.splice(monsterIndex, 1);
+  });
+
+  // 상대가 몬스터 처치 시 이벤트
+  serverSocket.on('opponentMonsterKill', (data) => {
+    const monsterIndex = data;
+    opponentMonsters.splice(monsterIndex, 1);
   });
 
   serverSocket.on('gameOver', (data) => {

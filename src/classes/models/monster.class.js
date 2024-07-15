@@ -31,7 +31,7 @@ class Monsters {
 
   // 사망한 몬스터 제거
   removeMonster(monsterIdx) {
-    this.data.slice(monsterIdx, 1);
+    return this.data.splice(monsterIdx, 1)[0];
   }
 
   decreaseMonsterHp(index, tower) {
