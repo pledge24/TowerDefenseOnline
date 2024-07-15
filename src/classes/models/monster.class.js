@@ -24,7 +24,9 @@ class Monsters {
 
     // 스폰된 몬스터 추가
     addMonster(monsterNumber){
-        this.data.push(new Monster(monsterNumber));
+        const newMonster = new Monster(this.currentLevel, monsterNumber);
+        this.data.push(newMonster);
+        return newMonster;
     }
 
     // 사망한 몬스터 제거
