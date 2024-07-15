@@ -71,6 +71,7 @@ let bgm;
 
 function initMap() {
   ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height); // 배경 이미지 그리기
+  opponentCtx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height); // 배경 이미지 그리기
   drawPath(monsterPath, ctx);
   drawPath(opponentMonsterPath, opponentCtx);
   placeInitialTowers(initialTowerCoords, towers, ctx); // 초기 타워 배치
@@ -176,6 +177,7 @@ function spawnMonster() {
   monsters.push(newMonster);
 
   // TODO. 서버로 몬스터 생성 이벤트 전송
+  
 }
 
 function gameLoop() {
@@ -333,12 +335,14 @@ Promise.all([
       winSound.play().then(() => {
         alert("당신이 게임에서 승리했습니다!");
         // TODO. 게임 종료 이벤트 전송
+
         location.reload();
       });
     } else {
       loseSound.play().then(() => {
         alert("아쉽지만 대결에서 패배하셨습니다! 다음 대결에서는 꼭 이기세요!");
         // TODO. 게임 종료 이벤트 전송
+
         location.reload();
       });
     }
