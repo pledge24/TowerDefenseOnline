@@ -18,6 +18,12 @@ export const getGameSession = (id) => {
   return gameSessions.find((session) => session.id === id);
 };
 
+export const getGameSessionByUserId = (userId) => {
+  gameSessions.forEach((gameSession) => {
+    if (gameSession.getUser(userId)) return gameSession;
+  });
+};
+
 export const getAllGameSessions = () => {
   return gameSessions;
 };
@@ -26,4 +32,4 @@ export const makeGameSession = (user1, user2) => {
   const gameSession = addGameSession();
   gameSession.addUser(user1);
   gameSession.addUser(user2);
-}
+};
