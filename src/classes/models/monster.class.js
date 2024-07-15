@@ -1,36 +1,40 @@
-import { Monster } from "../monster.js";
+import { Monster } from '../monster.js';
 
 class Monsters {
-    constructor(){
-        this.data = [];
-        this.monsterKillCount = 0;
-        this.currentLevel = 1;
-    }
+  constructor() {
+    this.data = [];
+    this.monsterKillCount = 0;
+    this.currentLevel = 1;
+  }
 
-    // 몬스터가 죽었을 때 횟수 증가
-    increaseMonsterKillCount() {
-        this.monsterKillCount++;
-    };
+  // 몬스터가 죽었을 때 횟수 증가
+  increaseMonsterKillCount() {
+    this.monsterKillCount++;
+  }
 
-    // 몬스터 레벨 증가
-    increaseMonsterLevel(){
-        this.currentLevel++;
-    };
+  // 몬스터 레벨 증가
+  increaseMonsterLevel() {
+    this.currentLevel++;
+  }
 
-    // 현재 몬스터 레벨 조회
-    getMonsterLevel(){
-        return this.currentLevel;
-    };
+  // 현재 몬스터 레벨 조회
+  getMonsterLevel() {
+    return this.currentLevel;
+  }
 
-    // 스폰된 몬스터 추가
-    addMonster(monsterNumber){
-        this.data.push(new Monster(monsterNumber));
-    }
+  // 스폰된 몬스터 추가
+  addMonster(monsterNumber) {
+    this.data.push(new Monster(monsterNumber));
+  }
 
-    // 사망한 몬스터 제거
-    removeMonster(monsterIdx){
-        this.data.slice(monsterIdx, 1);
-    }
+  // 사망한 몬스터 제거
+  removeMonster(monsterIdx) {
+    this.data.slice(monsterIdx, 1);
+  }
+
+  getMonster(monsterNumber) {
+    return this.data.forEach((m) => m.monsterNumber === monsterNumber);
+  }
 }
 
 export default Monsters;
