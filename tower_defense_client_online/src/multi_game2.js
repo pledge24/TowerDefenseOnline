@@ -227,6 +227,7 @@ function gameLoop() {
     } else {
       // TODO. 몬스터 사망 이벤트 전송
       serverSocket.emit('monsterKill', i);
+      serverSocket.emit('updateScore', { score: monster.score });
     }
   }
 
@@ -387,6 +388,12 @@ Promise.all([
   serverSocket.on('updateBaseHp', (data) => {
     baseHp = data;
     base.updateBaseHp(baseHp);
+  });
+
+  // 몬스터 처치 시 점수 증가
+  serverSocket.on('updatedScore', (data) => {
+    score += data;
+    console.log(score);
   });
 
   serverSocket.on('gameOver', (data) => {

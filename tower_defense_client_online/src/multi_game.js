@@ -27,17 +27,17 @@ let towerCost = 0; // 타워 구입 비용
 let monsterSpawnInterval = 1000; // 몬스터 생성 주기
 
 // 유저 데이터
-let userGold = 0;               // 유저 골드
-let base;                       // 기지 객체
-let baseHp = 100;               // 기지 체력 기본값
-let monsterLevel = 0;           // 몬스터 레벨
-let monsterPath;                // 몬스터 경로
-let initialTowerCoords;         // 초기 타워 좌표
-let basePosition;               // 기지 좌표
-const monsters = [];            // 유저 몬스터 목록
-const towers = [];              // 유저 타워 목록
-let score = 0;                  // 게임 점수
-let highScore = 0;              // 기존 최고 점수
+let userGold = 0; // 유저 골드
+let base; // 기지 객체
+let baseHp = 100; // 기지 체력 기본값
+let monsterLevel = 0; // 몬스터 레벨
+let monsterPath; // 몬스터 경로
+let initialTowerCoords; // 초기 타워 좌표
+let basePosition; // 기지 좌표
+const monsters = []; // 유저 몬스터 목록
+const towers = []; // 유저 타워 목록
+let score = 0; // 게임 점수
+let highScore = 0; // 기존 최고 점수
 
 // 상대 데이터
 let opponentBase; // 상대방 기지 객체
@@ -49,8 +49,8 @@ const opponentTowers = []; // 상대방 타워 목록
 
 let isInitGame = false;
 
-let baseX;    // 기지 x좌표 보정좌표
-let opponentBaseX;    // 적 기지 x좌표 보정좌표
+let baseX; // 기지 x좌표 보정좌표
+let opponentBaseX; // 적 기지 x좌표 보정좌표
 
 // 이미지 로딩 파트
 const backgroundImage = new Image();
@@ -116,9 +116,9 @@ function drawRotatedImage(image, x, y, width, height, angle, context) {
   context.rotate(angle);
   context.drawImage(image, -width / 2, -height / 2, width, height);
   context.restore();
-  
-  baseX = x + (width * 2);
-  opponentBaseX = x + (width * 2);
+
+  baseX = x + width * 2;
+  opponentBaseX = x + width * 2;
 }
 
 function getRandomPositionNearPath(maxDistance) {
@@ -215,6 +215,7 @@ function gameLoop() {
       monster.draw(ctx); // 몬스터 그리기
       const Attacked = monster.move();
       if (Attacked) {
+        console.log(i, Attacked)
         const attackedSound = new Audio('sounds/attacked.wav');
         attackedSound.volume = 0.3;
         attackedSound.play();
@@ -225,6 +226,7 @@ function gameLoop() {
     } else {
       // TODO. 몬스터 사망 이벤트 전송
       serverSocket.emit('monsterKill', i);
+      serverSocket.emit('updateScore', { score: monster.score });
     }
   }
 
@@ -275,7 +277,7 @@ function initGame(myData, opponentData) {
   console.log('opponentInitialTowerCoords', opponentInitialTowerCoords);
 
   baseHp = myData[3].baseHp;
-  console.log("baseHp", baseHp);
+  console.log('baseHp', baseHp);
 
   initMap(); // 맵 초기화 (배경, 몬스터 경로 그리기)
 
@@ -301,7 +303,7 @@ Promise.all([
 ]).then(() => {
   serverSocket = io('http://127.0.0.1:3000', {
     auth: {
-      token: localStorage.getItem("token"),
+      token: localStorage.getItem('token'),
     },
   });
 
@@ -394,7 +396,13 @@ Promise.all([
     base.updateBaseHp(baseHp);
   });
 
-  serverSocket.on("gameOver", (data) => {
+  // 몬스터 처치 시 점수 증가
+  serverSocket.on('updatedScore', (data) => {
+    score += data;
+    console.log(score);
+  });
+
+  serverSocket.on('gameOver', (data) => {
     bgm.pause();
     const { isWin } = data;
     const winSound = new Audio('sounds/win.wav');
