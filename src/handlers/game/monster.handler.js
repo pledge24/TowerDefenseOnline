@@ -30,6 +30,9 @@ export const notifySpawnedMonster = (socket, data) => {
 }
 
 
+// 몬스터 사망 처리
+// ???
+
 
 // 몬스터가 기지를 공격했을 때
 export const monsterAttackBase = (socket, data) => {
@@ -42,7 +45,7 @@ export const monsterAttackBase = (socket, data) => {
 	// console.log('monsterPower:',monsterPower);
 
 	/*
-	// 서버의 데이터와 비교 검증
+	// 서버의 데이터와 비교 검증 (여기서 빠져나오지 못하는 듯 함)
 	if(attacked.level !== user.MonstersModel.currentLevel) {
 	  return { status: 'fail', message: '서버와 레벨이 맞지 않습니다.' };
 	}
@@ -51,20 +54,21 @@ export const monsterAttackBase = (socket, data) => {
 	}
 	*/
 
-	// 기지의 HP를 감소
+	// 기지의 HP감소 적용
 	let userBaseHp = user.BaseModel.getBaseHp();
 	// console.log('baseHp Before:', userBaseHp);
 	user.BaseModel.setBaseHp(userBaseHp - monsterPower);
 	// userBaseHp = user.BaseModel.getBaseHp();
-	console.log('baseHp After:', userBaseHp);
+	// console.log('baseHp After:', userBaseHp);
 
+	// 기지 HP가 음수가 되지 않도록 조정
 	if (userBaseHp < 0) {
 		user.BaseModel.setBaseHp(0);
 		userBaseHp = user.BaseModel.getBaseHp();
-	}	// 기지 HP가 음수가 되지 않도록 조정
+	}
 	
-	console.log('baseHpForUpdate:', userBaseHp);
-	// 업데이트된 게임 상태를 클라이언트에 전송
+	// console.log('baseHpForUpdate:', userBaseHp);
+	// 업데이트된 기지 HP를 클라이언트에 전송
 	socket.emit('updateBaseHp', userBaseHp);
 
 	return { status: 'success', message: '기지가 공격 당했습니다.' };

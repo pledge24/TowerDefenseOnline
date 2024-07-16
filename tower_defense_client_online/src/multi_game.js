@@ -210,6 +210,7 @@ function gameLoop() {
         Math.pow(tower.x - monster.x, 2) + Math.pow(tower.y - monster.y, 2)
       );
       if (distance < tower.range) {
+        //serverSocket.emit('attackMonster', { monster });
         tower.attack(monster);
       }
     });
@@ -386,6 +387,14 @@ Promise.all([
     baseHp = data;
     base.updateBaseHp(baseHp);
   });
+
+  /*
+  // 기지 HP 업데이트 이벤트 수신
+  serverSocket.on('updateMonsterHp', (data) => {
+    const { index, monsterHp } = data;
+    monsters[index].hp = monsterHp;
+  });
+  */
 
   serverSocket.on("gameOver", (data) => {
     bgm.pause();

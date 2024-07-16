@@ -21,6 +21,12 @@ const registerHandler = (io) => {
       monsterAttackBase(socket, data)
     })
 
+    /*
+    socket.on('attackMonster', (data) => {
+      towerAttackMonster(socket, data)
+    })
+    */
+
     socket.on('disconnect', (socket) => {
       handleDisconnect(socket);
     });
