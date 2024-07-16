@@ -12,6 +12,12 @@ class Gold {
     setGold = (gold) => {
       this.data = gold;
     };   
+
+    // 해당 유저 골드 추가
+    addGold = (gold) => {
+      this.data += gold;
+      return this.data;
+    }
 }
 
 export default Gold;

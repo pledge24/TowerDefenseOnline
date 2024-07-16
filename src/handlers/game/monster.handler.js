@@ -36,7 +36,7 @@ export const monsterKill = (socket, data) => {
   const opponent = gameSession.users[0].id === user.id ? gameSession.users[1] : gameSession.users[0];
   const monsterIndex = removeMonster(user, data);
 
-  socket.emit('monsterKill', monsterIndex);
+  // socket.emit('monsterKill', monsterIndex);
   opponent.socket.emit('opponentMonsterKill', monsterIndex);
 
   return { status: 'success' };
@@ -45,12 +45,13 @@ export const monsterKill = (socket, data) => {
 // 몬스터가 기지를 공격했을 때
 export const monsterAttackBase = (socket, data) => {
   const user = getUserBySocket(socket);
-  const currentPower = user.MonstersModel.getMonsterPower();
+  // const currentPower = user.MonstersModel.getMonsterPower();
 
-  const { monster } = data;
-  const monsterPower = monster.attackPower;
+  const index = data;
+  const monster = user.MonstersModel.data[index];
+  const monsterPower = monster.power;
 
-  // console.log('monsterPower:',monsterPower);
+  console.log('monsterPower:',monsterPower);
 
   /*
 	// 서버의 데이터와 비교 검증
