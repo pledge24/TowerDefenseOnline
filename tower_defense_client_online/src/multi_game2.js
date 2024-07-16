@@ -30,7 +30,7 @@ let monsterSpawnInterval = 1000; // 몬스터 생성 주기
 // 유저 데이터
 let userGold = 0; // 유저 골드
 let base; // 기지 객체
-let baseHp = 100; // 기지 체력
+let baseHp = 100; // 기지 체력 기본값
 let monsterLevel = 0; // 몬스터 레벨
 let monsterPath; // 몬스터 경로
 let initialTowerCoords; // 초기 타워 좌표
@@ -49,6 +49,9 @@ const opponentMonsters = []; // 상대방 몬스터 목록
 const opponentTowers = []; // 상대방 타워 목록
 
 let isInitGame = false;
+
+let baseX; // 기지 x좌표 보정좌표
+let opponentBaseX; // 적 기지 x좌표 보정좌표
 
 // 이미지 로딩 파트
 const backgroundImage = new Image();
@@ -114,6 +117,9 @@ function drawRotatedImage(image, x, y, width, height, angle, context) {
   context.rotate(angle);
   context.drawImage(image, -width / 2, -height / 2, width, height);
   context.restore();
+
+  baseX = x + width * 2;
+  opponentBaseX = x + width * 2;
 }
 
 function getRandomPositionNearPath(maxDistance) {
@@ -157,12 +163,13 @@ function placeNewTower() {
   tower.draw(ctx, towerImage);
 }
 
+// 나의기지 및 상대기지 위치보정
 function placeBase(position, isPlayer) {
   if (isPlayer) {
-    base = new Base(position.x, position.y, baseHp);
+    base = new Base(baseX, position.y, baseHp);
     base.draw(ctx, baseImage);
   } else {
-    opponentBase = new Base(position.x, position.y, baseHp);
+    opponentBase = new Base(opponentBaseX, position.y, baseHp);
     opponentBase.draw(opponentCtx, baseImage, true);
   }
 }
@@ -214,7 +221,8 @@ function gameLoop() {
         attackedSound.volume = 0.3;
         attackedSound.play();
         // TODO. 몬스터가 기지를 공격했을 때 서버로 이벤트 전송
-        monsters.splice(i, 1);
+        serverSocket.emit('attackBase', { monster });
+        serverSocket.emit('monsterKill', i);
       }
     } else {
       // TODO. 몬스터 사망 이벤트 전송
@@ -267,6 +275,9 @@ function initGame(myData, opponentData) {
 
   console.log('initialTowerCoords', initialTowerCoords);
   console.log('opponentInitialTowerCoords', opponentInitialTowerCoords);
+
+  baseHp = myData[3].baseHp;
+  console.log('baseHp', baseHp);
 
   initMap(); // 맵 초기화 (배경, 몬스터 경로 그리기)
 
@@ -342,7 +353,7 @@ Promise.all([
 
   // 상대 몬스터 스폰 이벤트 수신
   serverSocket.on('spawnOpponentMonster', (monster) => {
-    // console.log("opponent(multi_game2) spawned monster");
+    // console.log("opponent(multi_game) spawned monster");
     const newMonster = new Monster(opponentMonsterPath, monsterImages, monster.level, monster.monsterNumber);
     opponentMonsters.push(newMonster);
   });
@@ -370,6 +381,12 @@ Promise.all([
   serverSocket.on('opponentMonsterKill', (data) => {
     const monsterIndex = data;
     opponentMonsters.splice(monsterIndex, 1);
+  });
+
+  // 기지 HP 업데이트 이벤트 수신
+  serverSocket.on('updateBaseHp', (data) => {
+    baseHp = data;
+    base.updateBaseHp(baseHp);
   });
 
   serverSocket.on('gameOver', (data) => {

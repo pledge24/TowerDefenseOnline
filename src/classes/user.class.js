@@ -18,7 +18,7 @@ class User {
 
   // 매칭 후 실행.
   gameStartInitialization(){ 
-    this.BaseModel = new Base(100);
+    this.BaseModel = new Base(150);
     this.GoldModel = new Gold(3000);
     this.MonstersModel = new Monsters();
     this.ScoreModel = new Score(0);

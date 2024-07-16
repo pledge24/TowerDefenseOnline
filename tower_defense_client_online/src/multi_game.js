@@ -27,17 +27,17 @@ let towerCost = 0; // 타워 구입 비용
 let monsterSpawnInterval = 1000; // 몬스터 생성 주기
 
 // 유저 데이터
-let userGold = 0; // 유저 골드
-let base; // 기지 객체
-let baseHp = 100; // 기지 체력
-let monsterLevel = 0; // 몬스터 레벨
-let monsterPath; // 몬스터 경로
-let initialTowerCoords; // 초기 타워 좌표
-let basePosition; // 기지 좌표
-const monsters = []; // 유저 몬스터 목록
-const towers = []; // 유저 타워 목록
-let score = 0; // 게임 점수
-let highScore = 0; // 기존 최고 점수
+let userGold = 0;               // 유저 골드
+let base;                       // 기지 객체
+let baseHp = 100;               // 기지 체력 기본값
+let monsterLevel = 0;           // 몬스터 레벨
+let monsterPath;                // 몬스터 경로
+let initialTowerCoords;         // 초기 타워 좌표
+let basePosition;               // 기지 좌표
+const monsters = [];            // 유저 몬스터 목록
+const towers = [];              // 유저 타워 목록
+let score = 0;                  // 게임 점수
+let highScore = 0;              // 기존 최고 점수
 
 // 상대 데이터
 let opponentBase; // 상대방 기지 객체
@@ -48,6 +48,9 @@ const opponentMonsters = []; // 상대방 몬스터 목록
 const opponentTowers = []; // 상대방 타워 목록
 
 let isInitGame = false;
+
+let baseX;    // 기지 x좌표 보정좌표
+let opponentBaseX;    // 적 기지 x좌표 보정좌표
 
 // 이미지 로딩 파트
 const backgroundImage = new Image();
@@ -113,6 +116,9 @@ function drawRotatedImage(image, x, y, width, height, angle, context) {
   context.rotate(angle);
   context.drawImage(image, -width / 2, -height / 2, width, height);
   context.restore();
+  
+  baseX = x + (width * 2);
+  opponentBaseX = x + (width * 2);
 }
 
 function getRandomPositionNearPath(maxDistance) {
@@ -156,12 +162,13 @@ function placeNewTower() {
   tower.draw(ctx, towerImage);
 }
 
+// 나의기지 및 상대기지 위치보정
 function placeBase(position, isPlayer) {
   if (isPlayer) {
-    base = new Base(position.x, position.y, baseHp);
+    base = new Base(baseX, position.y, baseHp);
     base.draw(ctx, baseImage);
   } else {
-    opponentBase = new Base(position.x, position.y, baseHp);
+    opponentBase = new Base(opponentBaseX, position.y, baseHp);
     opponentBase.draw(opponentCtx, baseImage, true);
   }
 }
@@ -173,7 +180,6 @@ function spawnMonster() {
 }
 
 function gameLoop() {
-  // 렌더링 시에는 항상 배경 이미지부터 그려야 합니다! 그래야 다른 이미지들이 배경 이미지 위에 그려져요!
   ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height); // 배경 이미지 다시 그리기
   drawPath(monsterPath, ctx); // 경로 다시 그리기
 
@@ -213,7 +219,8 @@ function gameLoop() {
         attackedSound.volume = 0.3;
         attackedSound.play();
         // TODO. 몬스터가 기지를 공격했을 때 서버로 이벤트 전송
-        monsters.splice(i, 1);
+        serverSocket.emit('attackBase', { monster });
+        serverSocket.emit('monsterKill', i);
       }
     } else {
       // TODO. 몬스터 사망 이벤트 전송
@@ -267,12 +274,22 @@ function initGame(myData, opponentData) {
   console.log('initialTowerCoords', initialTowerCoords);
   console.log('opponentInitialTowerCoords', opponentInitialTowerCoords);
 
+  baseHp = myData[3].baseHp;
+  console.log("baseHp", baseHp);
+
   initMap(); // 맵 초기화 (배경, 몬스터 경로 그리기)
 
   setInterval(spawnMonster, monsterSpawnInterval, 3000); // 설정된 몬스터 생성 주기마다 몬스터 생성
   gameLoop(); // 게임 루프 최초 실행
   isInitGame = true;
 }
+
+const sendEvent = (handlerId, data) => {
+  serverSocket.emit('event', {
+    handlerId,
+    data,
+  });
+};
 
 // 이미지 로딩 완료 후 서버와 연결하고 게임 초기화
 Promise.all([
@@ -284,7 +301,7 @@ Promise.all([
 ]).then(() => {
   serverSocket = io('http://127.0.0.1:3000', {
     auth: {
-      token: localStorage.getItem('token'),
+      token: localStorage.getItem("token"),
     },
   });
 
@@ -371,7 +388,13 @@ Promise.all([
     opponentMonsters.splice(monsterIndex, 1);
   });
 
-  serverSocket.on('gameOver', (data) => {
+  // 기지 HP 업데이트 이벤트 수신
+  serverSocket.on('updateBaseHp', (data) => {
+    baseHp = data;
+    base.updateBaseHp(baseHp);
+  });
+
+  serverSocket.on("gameOver", (data) => {
     bgm.pause();
     const { isWin } = data;
     const winSound = new Audio('sounds/win.wav');
@@ -382,12 +405,14 @@ Promise.all([
       winSound.play().then(() => {
         alert('당신이 게임에서 승리했습니다!');
         // TODO. 게임 종료 이벤트 전송
+
         location.reload();
       });
     } else {
       loseSound.play().then(() => {
         alert('아쉽지만 대결에서 패배하셨습니다! 다음 대결에서는 꼭 이기세요!');
         // TODO. 게임 종료 이벤트 전송
+
         location.reload();
       });
     }
@@ -407,3 +432,5 @@ buyTowerButton.style.display = 'none';
 buyTowerButton.addEventListener('click', placeNewTower);
 
 document.body.appendChild(buyTowerButton);
+
+export { sendEvent };

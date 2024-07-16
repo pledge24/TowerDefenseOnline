@@ -1,6 +1,6 @@
 import { handleConnection, handleDisconnect, handlerEvent } from './helper.js';
 import { addUserInQueue } from '../session/matchQueue.session.js';
-import { monsterKill, notifySpawnedMonster } from './game/monster.handler.js';
+import { monsterKill, notifySpawnedMonster, monsterAttackBase } from './game/monster.handler.js';
 import { towerAttack } from './game/towerAttack.handler.js';
 
 // 게임 매칭 시작버튼 누를 때 실행.
@@ -22,6 +22,10 @@ const registerHandler = (io) => {
 
     socket.on('monsterKill', (data) => {
       monsterKill(socket, data);
+    });
+
+    socket.on('attackBase', (data) => {
+      monsterAttackBase(socket, data);
     });
 
     socket.on('disconnect', (socket) => {
