@@ -16,6 +16,7 @@ class Score {
   // 해당 유저 점수 추가
   addScore(score) {
     this.data += score;
+    return this.data;
   }
 
 }

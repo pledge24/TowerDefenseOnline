@@ -23,9 +23,10 @@ class Monsters {
   }
 
   // 몬스터 체력 설정
-  increaseMonsterLevel() {
+  setMonsterHp() {
     this.monsterHp = 100 + this.currentLevel * 10;
   }
+
   // 현재 몬스터 체력 조회
   getMonsterHp() {
     return this.monsterHp;
@@ -53,6 +54,7 @@ class Monsters {
   }
 
   decreaseMonsterHp(index, tower) {
+    
     const monster = this.data[index];
     monster.hp -= tower.attackPower;
     return monster.hp;

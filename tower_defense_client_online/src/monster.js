@@ -26,7 +26,7 @@ export class Monster {
     this.score = 90 + 10 * level
   }
 
-  move(base) {
+  move() {
     if (this.currentIndex < this.path.length - 1) {
       const nextPoint = this.path[this.currentIndex + 1];
       const deltaX = nextPoint.x - this.x;

@@ -36,7 +36,6 @@ export const monsterKill = (socket, data) => {
   const opponent = gameSession.users[0].id === user.id ? gameSession.users[1] : gameSession.users[0];
   const monsterIndex = removeMonster(user, data);
 
-  socket.emit('monsterKill', monsterIndex);
   opponent.socket.emit('opponentMonsterKill', monsterIndex);
 
   return { status: 'success' };
