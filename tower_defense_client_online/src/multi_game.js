@@ -22,7 +22,11 @@ const progressBarMessage = document.getElementById('progressBarMessage');
 const progressBar = document.getElementById('progressBar');
 const loader = document.getElementsByClassName('loader')[0];
 
-const NUM_OF_MONSTERS = 5; // 몬스터 개수(종류)
+const chat = document.getElementById('chatting-container');
+const messageForm = document.getElementById('messageForm');
+const messageInput = document.getElementById('messageInput');
+
+const NUM_OF_MONSTERS = 5; // 몬스터 개수
 // 게임 데이터
 let towerCost = 500; // 타워 구입 비용
 let monsterSpawnInterval = 900; // 몬스터 생성 주기
@@ -164,9 +168,8 @@ function placeNewTower() {
     towers.push(tower);
     tower.draw(ctx, towerImage);
 
-    serverSocket.emit('buyTower', {tower, towerCost});
+    serverSocket.emit('buyTower', { tower, towerCost });
   }
-  
 }
 
 // 나의기지 및 상대기지 위치보정
@@ -265,6 +268,9 @@ function initGame(myData, opponentData) {
   bgm.loop = true;
   bgm.volume = 0.2;
   bgm.play();
+
+  document.getElementById('chatting-container').style.display = 'flex';
+  document.getElementById('messageForm').style.display = 'flex';
 
   userId = myData[0];
 
@@ -383,7 +389,7 @@ Promise.all([
 
   // 타워 구입시 이벤트
   serverSocket.on('buyTower', (data) => {
-    const {x, y} = data;
+    const { x, y } = data;
     const phurchased = new Tower(x, y);
 
     opponentTowers.push(phurchased);
@@ -436,7 +442,34 @@ Promise.all([
       });
     }
   });
+
+  serverSocket.on('room_chat', (data) => {
+    appendMessage(`[${data.username}] ${data.msg}`);
+  });
 });
+
+messageForm.addEventListener('submit', (e) => {
+  e.preventDefault();
+  const msg = messageInput.value;
+  if (msg) {
+    const messageElement = document.createElement('div');
+    messageElement.id = 'chat';
+    messageElement.textContent = msg;
+    chat.appendChild(messageElement);
+    messageInput.value = '';
+    chat.scrollTop = chat.scrollHeight;
+    serverSocket.emit('room_chat', { msg });
+  }
+});
+
+const appendMessage = (content, className = 'message') => {
+  const div = document.createElement('div');
+  div.id = 'chat';
+  div.className = className;
+  div.textContent = content;
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+};
 
 const buyTowerButton = document.createElement('button');
 buyTowerButton.textContent = '타워 구입';

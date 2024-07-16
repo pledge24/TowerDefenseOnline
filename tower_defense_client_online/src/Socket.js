@@ -14,6 +14,16 @@ class Socket {
       },
     });
 
+
+    this.socket.on('room_chat', (data) => {
+      appendMessage([${data.room}][${data.username}] ${data.msg});
+  });
+
+  this.socket.on('rooms', (rooms) => {
+      appendMessage(You are in rooms: ${rooms.join(', ')}, 'system');
+  });
+
+
     this.socket.on('response', (data) => {
       if (data.status === 'fail') {
         console.error(data);
