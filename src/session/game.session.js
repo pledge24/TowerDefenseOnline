@@ -14,6 +14,15 @@ export const removeGameSession = (userId) => {
   }
 };
 
+export const removeGameSessionBySocket = (socket) => {
+  const index = gameSessions.findIndex(
+    (session) => session.users[0].socket.id === socket.id || session.users[1].socket.id === socket.id
+  );
+  if (index !== -1) {
+    gameSessions.splice(index, 1);
+  }
+};
+
 export const getGameSession = (userId) => {
   return gameSessions.find((session) => session.users[0].id === userId || session.users[1].id === userId);
 };

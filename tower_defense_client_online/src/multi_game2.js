@@ -262,6 +262,9 @@ function initGame(myData, opponentData) {
   bgm.volume = 0.2;
   bgm.play();
 
+  document.getElementById('chatting-container').style.display = 'flex';
+  document.getElementById('messageForm').style.display = 'flex';
+
   userId = myData[0];
 
   monsterPath = myData[1].data;
