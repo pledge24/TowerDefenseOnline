@@ -32,7 +32,7 @@ let monsterInterval; // 몬스터 인터벌
 let userGold = 0; // 유저 골드
 let base; // 기지 객체
 let baseHp = 100; // 기지 체력 기본값
-let monsterLevel = 0; // 몬스터 레벨
+let monsterLevel = 1; // 몬스터 레벨
 let monsterPath; // 몬스터 경로
 let initialTowerCoords; // 초기 타워 좌표
 let basePosition; // 기지 좌표
@@ -230,7 +230,7 @@ function gameLoop() {
       // TODO. 몬스터 사망 이벤트 전송
       monsters.splice(i, 1);
       serverSocket.emit('monsterKill', i);
-      serverSocket.emit('updateScore', { monsterScore: monster.score });
+      serverSocket.emit('updateScoreAndGold', { monsterScore: monster.score, monsterIndex: i });
     }
   }
 
@@ -284,6 +284,9 @@ function initGame(myData, opponentData) {
 
   baseHp = myData[3].baseHp;
   console.log('baseHp', baseHp);
+
+  userGold = myData[4].data;
+  console.log('userGold', userGold);
 
   initMap(); // 맵 초기화 (배경, 몬스터 경로 그리기)
 
@@ -401,9 +404,11 @@ Promise.all([
     }
   });
 
-  // 몬스터 처치 시 점수 증가
-  serverSocket.on('updatedScore', (data) => {
+  // 몬스터 처치 시 점수, 골드, 레벨 증가
+  serverSocket.on('updatedScoreAndGold', (data) => {
     score = data.updatedScore;
+    userGold = data.currentGold;
+    monsterLevel = data.updatedLevel;
   });
 
   serverSocket.on('gameOver', (data) => {
