@@ -48,7 +48,6 @@ let opponentInitialTowerCoords; // 상대방 초기 타워 좌표
 let opponentBasePosition; // 상대방 기지 좌표
 const opponentMonsters = []; // 상대방 몬스터 목록
 const opponentTowers = []; // 상대방 타워 목록
-let opponentId;
 
 let isInitGame = false;
 
