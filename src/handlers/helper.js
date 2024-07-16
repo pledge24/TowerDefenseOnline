@@ -9,7 +9,6 @@ export const handleDisconnect = (socket) => {
 };
 
 export const handleConnection = async (socket) => {
-
   const username = socket.handshake.auth.token.split(' ');
   const decodedToken = jwt.verify(username[1], config.token.tokenSecretKey);
 
@@ -25,7 +24,7 @@ export const handlerEvent = (io, socket, data) => {
     return;
   }
   // 이벤트 트리거 확인용 출력문
-  // console.log(`EVENT(${data.handlerId}) IS TRIGGERD! USER ID: ${data.userid}`);
+  //console.log(`EVENT(${data.handlerId}) IS TRIGGERD! USER ID: ${data.userid}`);
 
   const handler = handlerMappings[data.handlerId];
   if (!handler) {
