@@ -7,10 +7,10 @@ export const addGameSession = () => {
   return session;
 };
 
-export const removeGameSession = (id) => {
-  const index = gameSessions.findIndex((session) => session.id === id);
+export const removeGameSession = (userId) => {
+  const index = gameSessions.findIndex((session) => session.users[0].id === userId || session.users[1].id === userId);
   if (index !== -1) {
-    return gameSessions.splice(index, 1)[0];
+    gameSessions.splice(index, 1);
   }
 };
 
@@ -26,4 +26,4 @@ export const makeGameSession = (user1, user2) => {
   const gameSession = addGameSession();
   gameSession.addUser(user1);
   gameSession.addUser(user2);
-}
+};

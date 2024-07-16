@@ -31,7 +31,7 @@ let monsterSpawnInterval = 1000; // 몬스터 생성 주기
 let userGold = 0; // 유저 골드
 let base; // 기지 객체
 let baseHp = 100; // 기지 체력 기본값
-let monsterLevel = 0; // 몬스터 레벨
+let monsterLevel = 1; // 몬스터 레벨
 let monsterPath; // 몬스터 경로
 let initialTowerCoords; // 초기 타워 좌표
 let basePosition; // 기지 좌표
@@ -39,6 +39,7 @@ const monsters = []; // 유저 몬스터 목록
 const towers = []; // 유저 타워 목록
 let score = 0; // 게임 점수
 let highScore = 0; // 기존 최고 점수
+let userId;
 
 // 상대 데이터
 let opponentBase; // 상대방 기지 객체
@@ -232,6 +233,7 @@ function gameLoop() {
       // TODO. 몬스터 사망 이벤트 전송
       monsters.splice(i, 1);
       serverSocket.emit('monsterKill', i);
+      serverSocket.emit('updateScoreAndGold', { monsterScore: monster.score, monsterIndex: i });
     }
   }
 
@@ -263,6 +265,8 @@ function initGame(myData, opponentData) {
   bgm.volume = 0.2;
   bgm.play();
 
+  userId = myData[0];
+
   monsterPath = myData[1].data;
   opponentMonsterPath = opponentData[1].data;
 
@@ -281,6 +285,15 @@ function initGame(myData, opponentData) {
   gameLoop(); // 게임 루프 최초 실행
   isInitGame = true;
 }
+
+const sendEvent = (handlerId, data) => {
+  serverSocket.emit('event', {
+    userId,
+    clientVersion: CLIENT_VERSION,
+    handlerId,
+    payload: data,
+  });
+};
 
 // 이미지 로딩 완료 후 서버와 연결하고 게임 초기화
 Promise.all([
@@ -349,7 +362,8 @@ Promise.all([
 
   // 상대 몬스터 스폰 이벤트 수신
   serverSocket.on('spawnOpponentMonster', (monster) => {
-    // console.log("opponent(multi_game) spawned monster");
+    console.log(serverSocket.id);
+    console.log('opponent(multi_game) spawned monster');
     const newMonster = new Monster(opponentMonsterPath, monsterImages, monster.level, monster.monsterNumber);
     opponentMonsters.push(newMonster);
   });
@@ -386,6 +400,16 @@ Promise.all([
   serverSocket.on('updateBaseHp', (data) => {
     baseHp = data;
     base.updateBaseHp(baseHp);
+    if (base.hp <= 0) {
+      sendEvent(31, {});
+    }
+  });
+
+  // 몬스터 처치 시 점수, 골드 레벨 증가
+  serverSocket.on('updatedScoreAndGold', (data) => {
+    score = data.updatedScore;
+    userGold = data.currentGold;
+    monsterLevel = data.updatedLevel;
   });
 
   serverSocket.on('gameOver', (data) => {
@@ -399,12 +423,14 @@ Promise.all([
       winSound.play().then(() => {
         alert('당신이 게임에서 승리했습니다!');
         // TODO. 게임 종료 이벤트 전송
+        sendEvent(32, { isWin });
         location.reload();
       });
     } else {
       loseSound.play().then(() => {
         alert('아쉽지만 대결에서 패배하셨습니다! 다음 대결에서는 꼭 이기세요!');
         // TODO. 게임 종료 이벤트 전송
+        sendEvent(32, { isWin });
         location.reload();
       });
     }
@@ -424,3 +450,5 @@ buyTowerButton.style.display = 'none';
 buyTowerButton.addEventListener('click', placeNewTower);
 
 document.body.appendChild(buyTowerButton);
+
+export { sendEvent };

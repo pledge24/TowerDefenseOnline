@@ -25,6 +25,7 @@ class Monsters {
   setMonsterHp(index) {
     this.data[index].hp = 100 + this.currentLevel * 10;
   }
+
   // 현재 몬스터 체력 조회
   getMonsterHp(index) {
     return this.data[index].getHp();
@@ -34,9 +35,15 @@ class Monsters {
   increaseMonsterPower(index) {
     this.data[index].power = 10 + this.currentLevel * 1;
   }
+
   // 현재 몬스터 공격력 조회
   getMonsterPower(index) {
     return this.data[index].getPower();
+  }
+
+  // 현재 몬스터 골드 조회
+  getMonsterGold(index) {
+    return this.data[index].getGold();
   }
 
   // 스폰된 몬스터 추가
