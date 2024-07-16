@@ -4,6 +4,7 @@ import { getUserBySocket } from './user.session.js';
 
 export const addUserInQueue = (socket, data) => {
   //console.log("width, height: ", data.width, data.height);
+  console.log(socket);
   const user = getUserBySocket(socket);
   user.canvas = {width: data.width, height: data.height};
   // console.log("user", user);

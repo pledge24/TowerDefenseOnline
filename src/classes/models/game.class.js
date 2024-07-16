@@ -36,8 +36,8 @@ class Game {
       user.gameStartInitialization();
     });
 
-    const user1_data = [this.users[0].id, this.users[0].PathModel, this.users[0].TowersModel, this.users[0].BaseModel];
-    const user2_data = [this.users[1].id, this.users[1].PathModel, this.users[1].TowersModel, this.users[1].BaseModel];
+    const user1_data = [this.users[0].id, this.users[0].PathModel, this.users[0].TowersModel, this.users[0].BaseModel, this.users[0].GoldModel];
+    const user2_data = [this.users[1].id, this.users[1].PathModel, this.users[1].TowersModel, this.users[1].BaseModel, this.users[1].GoldModel];
     //console.log("user1_data", user1_data);
     //console.log("user2_data", user2_data);
     // user1.socket.emit("matchFound", JSON.parse(JSON.stringify(user2)));

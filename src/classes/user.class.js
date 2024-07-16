@@ -28,7 +28,6 @@ class User {
     this.state = 'playing'
   }
 
-
 }
 
 export default User;

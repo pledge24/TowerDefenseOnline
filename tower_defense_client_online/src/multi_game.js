@@ -21,10 +21,10 @@ const progressBarMessage = document.getElementById('progressBarMessage');
 const progressBar = document.getElementById('progressBar');
 const loader = document.getElementsByClassName('loader')[0];
 
-const NUM_OF_MONSTERS = 5; // 몬스터 개수
+const NUM_OF_MONSTERS = 5; // 몬스터 개수(종류)
 // 게임 데이터
-let towerCost = 0; // 타워 구입 비용
-let monsterSpawnInterval = 1000; // 몬스터 생성 주기
+let towerCost = 500; // 타워 구입 비용
+let monsterSpawnInterval = 900; // 몬스터 생성 주기
 
 // 유저 데이터
 let userGold = 0;               // 유저 골드
@@ -154,12 +154,16 @@ function placeNewTower() {
   if (userGold < towerCost) {
     alert('골드가 부족합니다.');
     return;
-  }
+  } else {
+    userGold -= towerCost;
+    const { x, y } = getRandomPositionNearPath(200);
+    const tower = new Tower(x, y);
+    towers.push(tower);
+    tower.draw(ctx, towerImage);
 
-  const { x, y } = getRandomPositionNearPath(200);
-  const tower = new Tower(x, y);
-  towers.push(tower);
-  tower.draw(ctx, towerImage);
+    serverSocket.emit('buyTower', {tower, towerCost});
+  }
+  
 }
 
 // 나의기지 및 상대기지 위치보정
@@ -261,23 +265,14 @@ function initGame(myData, opponentData) {
   monsterPath = myData[1].data;
   opponentMonsterPath = opponentData[1].data;
 
-  console.log('monsterPath', monsterPath);
-  console.log('opponentMonsterPath', opponentMonsterPath);
-
   basePosition = monsterPath[monsterPath.length - 1];
   opponentBasePosition = opponentMonsterPath[opponentMonsterPath.length - 1];
-
-  console.log('basePosition', basePosition);
-  console.log('opponentBasePosition', opponentBasePosition);
 
   initialTowerCoords = myData[2].data;
   opponentInitialTowerCoords = opponentData[2].data;
 
-  console.log('initialTowerCoords', initialTowerCoords);
-  console.log('opponentInitialTowerCoords', opponentInitialTowerCoords);
-
   baseHp = myData[3].baseHp;
-  console.log("baseHp", baseHp);
+  userGold = myData[4].data;
 
   initMap(); // 맵 초기화 (배경, 몬스터 경로 그리기)
 
@@ -378,14 +373,14 @@ Promise.all([
     opponentMonsters[monsterIndex].hp = monsterHp;
   });
 
-  /*
-  // 내 몬스터 처치 시 이벤트
-  serverSocket.on('monsterKill', (data) => {
-    const monsterIndex = data;
-    console.log(monsters[data]);
-    monsters.splice(monsterIndex, 1);
+  // 타워 구입시 이벤트
+  serverSocket.on('buyTower', (data) => {
+    const {x, y} = data;
+    const phurchased = new Tower(x, y);
+
+    opponentTowers.push(phurchased);
+    phurchased.draw(opponentCtx, towerImage);
   });
-  */
 
   // 상대가 몬스터 처치 시 이벤트
   serverSocket.on('opponentMonsterKill', (data) => {
@@ -398,14 +393,6 @@ Promise.all([
     baseHp = data;
     base.updateBaseHp(baseHp);
   });
-
-  /*
-  // 몬스터 HP 업데이트 이벤트 수신
-  serverSocket.on('updateMonsterHp', (data) => {
-    const { index, monsterHp } = data;
-    monsters[index].hp = monsterHp;
-  });
-  */
 
   serverSocket.on("gameOver", (data) => {
     bgm.pause();
