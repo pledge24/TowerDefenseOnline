@@ -34,6 +34,7 @@ const registerHandler = (io) => {
     });
 
     socket.on('disconnect', (socket) => {
+      console.log('disconnect');
       handleDisconnect(socket);
     });
   });

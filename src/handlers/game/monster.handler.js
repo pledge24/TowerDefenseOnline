@@ -63,22 +63,21 @@ export const monsterAttackBase = (socket, data) => {
 	}
 	*/
 
-	// 기지의 HP감소 적용
-	let userBaseHp = user.BaseModel.getBaseHp();
-	// console.log('baseHp Before:', userBaseHp);
-	user.BaseModel.setBaseHp(userBaseHp - monsterPower);
-	// userBaseHp = user.BaseModel.getBaseHp();
-	// console.log('baseHp After:', userBaseHp);
+  // 기지의 HP를 감소
+  let userBaseHp = user.BaseModel.getBaseHp();
+  // console.log('baseHp Before:', userBaseHp);
+  user.BaseModel.setBaseHp(userBaseHp - monsterPower);
+  // userBaseHp = user.BaseModel.getBaseHp();
+  //console.log('baseHp After:', userBaseHp);
 
-	// 기지 HP가 음수가 되지 않도록 조정
-	if (userBaseHp < 0) {
-		user.BaseModel.setBaseHp(0);
-		userBaseHp = user.BaseModel.getBaseHp();
-	}
-	
-	// console.log('baseHpForUpdate:', userBaseHp);
-	// 업데이트된 기지 HP를 클라이언트에 전송
-	socket.emit('updateBaseHp', userBaseHp);
+  if (userBaseHp < 0) {
+    user.BaseModel.setBaseHp(0);
+    userBaseHp = user.BaseModel.getBaseHp();
+  } // 기지 HP가 음수가 되지 않도록 조정
+
+  //console.log('baseHpForUpdate:', userBaseHp);
+  // 업데이트된 게임 상태를 클라이언트에 전송
+  socket.emit('updateBaseHp', userBaseHp);
 
   return { status: 'success', message: '기지가 공격 당했습니다.' };
 };
