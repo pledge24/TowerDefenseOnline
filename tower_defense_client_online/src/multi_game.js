@@ -196,13 +196,14 @@ function gameLoop() {
   ctx.fillText(`현재 레벨: ${monsterLevel}`, 100, 200); // 최고 기록 표시
 
   // 타워 그리기 및 몬스터 공격 처리
-  towers.forEach((tower) => {
+  towers.forEach((tower, towerIndex) => {
     tower.draw(ctx, towerImage);
     tower.updateCooldown();
-    monsters.forEach((monster) => {
+    monsters.forEach((monster, monsterIndex) => {
       const distance = Math.sqrt(Math.pow(tower.x - monster.x, 2) + Math.pow(tower.y - monster.y, 2));
-      if (distance < tower.range) {
+      if (distance < tower.range && tower.cooldown === 0) {
         tower.attack(monster);
+        serverSocket.emit('towerAttack', { tower, towerIndex, monsterIndex });
       }
     });
   });
@@ -221,12 +222,11 @@ function gameLoop() {
         attackedSound.play();
         // TODO. 몬스터가 기지를 공격했을 때 서버로 이벤트 전송
         serverSocket.emit('attackBase', { monster });
-        monsters.splice(i, 1);
+        serverSocket.emit('monsterKill', i);
       }
     } else {
       // TODO. 몬스터 사망 이벤트 전송
-
-      monsters.splice(i, 1);
+      serverSocket.emit('monsterKill', i);
     }
   }
 
@@ -283,7 +283,7 @@ function initGame(myData, opponentData) {
 
   initMap(); // 맵 초기화 (배경, 몬스터 경로 그리기)
 
-  setInterval(spawnMonster, monsterSpawnInterval); // 설정된 몬스터 생성 주기마다 몬스터 생성
+  setInterval(spawnMonster, monsterSpawnInterval, 3000); // 설정된 몬스터 생성 주기마다 몬스터 생성
   gameLoop(); // 게임 루프 최초 실행
   isInitGame = true;
 }
@@ -367,6 +367,31 @@ Promise.all([
     // console.log("opponent(multi_game2) spawned monster");
     const newMonster = new Monster(opponentMonsterPath, monsterImages, monster.level, monster.monsterNumber);
     opponentMonsters.push(newMonster);
+  });
+
+  // 내 타워가 몬스터 공격했을 때 이벤트
+  serverSocket.on('decreaseMonsterHp', (data) => {
+    const { monsterIndex, monsterHp } = data;
+    monsters[monsterIndex].hp = monsterHp;
+  });
+
+  // 상대 타워가 몬스터 공격했을 때 이벤트
+  serverSocket.on('decreaseOpponentMonsterHp', (data) => {
+    const { monsterIndex, monsterHp, towerIndex } = data;
+    opponentTowers[towerIndex].attack(opponentMonsters[monsterIndex]);
+    opponentMonsters[monsterIndex].hp = monsterHp;
+  });
+
+  // 내 몬스터 처치 시 이벤트
+  serverSocket.on('monsterKill', (data) => {
+    const monsterIndex = data;
+    monsters.splice(monsterIndex, 1);
+  });
+
+  // 상대가 몬스터 처치 시 이벤트
+  serverSocket.on('opponentMonsterKill', (data) => {
+    const monsterIndex = data;
+    opponentMonsters.splice(monsterIndex, 1);
   });
 
   // 기지 HP 업데이트 이벤트 수신
