@@ -31,12 +31,14 @@
         gap: 20px;
       }
       #chatting-container {
+        background-color: #ffffff66;
         position: fixed;
         top: 10px;
         display: none;
         border: 1px solid #ccc;
         height: 200px;
         width: 500px;
+        flex-direction: column;
         overflow-y: scroll;
       }
 
@@ -45,6 +47,17 @@
         display: none;
         top: 220px;
       }
+
+      #chat {
+        font-size: 20px;
+        text-shadow:
+          -1px 0 #000,
+          0 1px #000,
+          1px 0 #000,
+          0 -1px #000;
+        color: #3aa85e;
+      }
+
       .button-container button {
         padding: 10px 20px;
         font-size: 16px;
@@ -130,23 +143,6 @@
         document.querySelector('.button-container').style.display = 'none';
         document.getElementById('progressBarContainer').style.display = 'block';
         import('./src/multi_game2.js');
-      });
-
-      const chat = document.getElementById('chatting-container');
-      const messageForm = document.getElementById('messageForm');
-      const messageInput = document.getElementById('messageInput');
-
-      messageForm.addEventListener('submit', function (event) {
-        event.preventDefault(); // Prevent the default form submission (page reload)
-        const message = messageInput.value.trim();
-        console.log('msg: ', message);
-        if (message) {
-          const messageElement = document.createElement('div');
-          messageElement.textContent = message;
-          chat.appendChild(messageElement);
-          messageInput.value = ''; // Clear the input field
-          chat.scrollTop = chat.scrollHeight; // Scroll to the bottom
-        }
       });
     </script>
   </body>

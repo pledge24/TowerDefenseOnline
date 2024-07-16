@@ -51,7 +51,7 @@ export const monsterAttackBase = (socket, data) => {
   const monster = user.MonstersModel.data[index];
   const monsterPower = monster.power;
 
-  console.log('monsterPower:',monsterPower);
+  console.log('monsterPower:', monsterPower);
 
   /*
 	// 서버의 데이터와 비교 검증

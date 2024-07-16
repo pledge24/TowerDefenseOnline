@@ -27,6 +27,12 @@ export const getGameSession = (userId) => {
   return gameSessions.find((session) => session.users[0].id === userId || session.users[1].id === userId);
 };
 
+export const getGameSessionBySocket = (socket) => {
+  return gameSessions.find(
+    (session) => session.users[0].socket.id === socket.id || session.users[1].socket.id === socket.id
+  );
+};
+
 export const getAllGameSessions = () => {
   return gameSessions;
 };
