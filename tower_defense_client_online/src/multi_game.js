@@ -215,17 +215,19 @@ function gameLoop() {
       monster.draw(ctx); // 몬스터 그리기
       const Attacked = monster.move();
       if (Attacked) {
-        console.log(i, Attacked);
-        const attackedSound = new Audio('sounds/attacked.wav');
+        const attackedSound = new Audio('../sounds/attacked.wav');
         attackedSound.volume = 0.3;
         attackedSound.play();
         // TODO. 몬스터가 기지를 공격했을 때 서버로 이벤트 전송
+        monsters.splice(i, 1);
+        serverSocket.emit('attackBase', i);
         monsters.splice(i, 1);
         serverSocket.emit('attackBase', i);
         serverSocket.emit('monsterKill', i);
       }
     } else {
       // TODO. 몬스터 사망 이벤트 전송
+      monsters.splice(i, 1);
       monsters.splice(i, 1);
       serverSocket.emit('monsterKill', i);
       serverSocket.emit('updateScore', { monsterScore: monster.score, monsterLevel: monster.level });

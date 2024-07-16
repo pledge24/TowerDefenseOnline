@@ -221,11 +221,13 @@ function gameLoop() {
         attackedSound.volume = 0.3;
         attackedSound.play();
         // TODO. 몬스터가 기지를 공격했을 때 서버로 이벤트 전송
-        serverSocket.emit('attackBase', { monster });
+        monsters.splice(i, 1);
+        serverSocket.emit('attackBase', i);
         serverSocket.emit('monsterKill', i);
       }
     } else {
       // TODO. 몬스터 사망 이벤트 전송
+      monsters.splice(i, 1);
       serverSocket.emit('monsterKill', i);
       serverSocket.emit('updateScore', { score: monster.score });
     }
@@ -372,11 +374,13 @@ Promise.all([
     opponentMonsters[monsterIndex].hp = monsterHp;
   });
 
+  /*
   // 내 몬스터 처치 시 이벤트
   serverSocket.on('monsterKill', (data) => {
     const monsterIndex = data;
     monsters.splice(monsterIndex, 1);
   });
+  */
 
   // 상대가 몬스터 처치 시 이벤트
   serverSocket.on('opponentMonsterKill', (data) => {

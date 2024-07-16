@@ -36,6 +36,7 @@ export const monsterKill = (socket, data) => {
   const opponent = gameSession.users[0].id === user.id ? gameSession.users[1] : gameSession.users[0];
   const monsterIndex = removeMonster(user, data);
 
+  // socket.emit('monsterKill', monsterIndex);
   opponent.socket.emit('opponentMonsterKill', monsterIndex);
 
   return { status: 'success' };
@@ -44,12 +45,13 @@ export const monsterKill = (socket, data) => {
 // 몬스터가 기지를 공격했을 때
 export const monsterAttackBase = (socket, data) => {
   const user = getUserBySocket(socket);
-  const currentPower = user.MonstersModel.getMonsterPower();
+  // const currentPower = user.MonstersModel.getMonsterPower();
 
-  const { monster } = data;
-  const monsterPower = monster.attackPower;
+  const index = data;
+  const monster = user.MonstersModel.data[index];
+  const monsterPower = monster.power;
 
-  // console.log('monsterPower:',monsterPower);
+  console.log('monsterPower:',monsterPower);
 
   /*
 	// 서버의 데이터와 비교 검증
@@ -61,21 +63,22 @@ export const monsterAttackBase = (socket, data) => {
 	}
 	*/
 
-  // 기지의 HP를 감소
-  let userBaseHp = user.BaseModel.getBaseHp();
-  // console.log('baseHp Before:', userBaseHp);
-  user.BaseModel.setBaseHp(userBaseHp - monsterPower);
-  // userBaseHp = user.BaseModel.getBaseHp();
-  console.log('baseHp After:', userBaseHp);
+	// 기지의 HP감소 적용
+	let userBaseHp = user.BaseModel.getBaseHp();
+	// console.log('baseHp Before:', userBaseHp);
+	user.BaseModel.setBaseHp(userBaseHp - monsterPower);
+	// userBaseHp = user.BaseModel.getBaseHp();
+	// console.log('baseHp After:', userBaseHp);
 
-  if (userBaseHp < 0) {
-    user.BaseModel.setBaseHp(0);
-    userBaseHp = user.BaseModel.getBaseHp();
-  } // 기지 HP가 음수가 되지 않도록 조정
-
-  console.log('baseHpForUpdate:', userBaseHp);
-  // 업데이트된 게임 상태를 클라이언트에 전송
-  socket.emit('updateBaseHp', userBaseHp);
+	// 기지 HP가 음수가 되지 않도록 조정
+	if (userBaseHp < 0) {
+		user.BaseModel.setBaseHp(0);
+		userBaseHp = user.BaseModel.getBaseHp();
+	}
+	
+	// console.log('baseHpForUpdate:', userBaseHp);
+	// 업데이트된 기지 HP를 클라이언트에 전송
+	socket.emit('updateBaseHp', userBaseHp);
 
   return { status: 'success', message: '기지가 공격 당했습니다.' };
 };

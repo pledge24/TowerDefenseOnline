@@ -11,4 +11,18 @@ export class Monster {
     // this.speed = monsterData.speed; // 몬스터의 이동 속도
     // this.successAttack = false;
   }
+
+  getHp() {
+    return this.power;
+  }
+  setHp(HP) {
+    this.hp = HP;
+  }
+
+  getPower() {
+    return this.power;
+  }
+  setPower(POWER) {
+    this.power = POWER;
+  }
 }
