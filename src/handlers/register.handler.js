@@ -1,10 +1,11 @@
 import { handleConnection, handleDisconnect, handlerEvent } from './helper.js';
 import { addUserInQueue } from '../session/matchQueue.session.js';
 import { monsterKill, notifySpawnedMonster, monsterAttackBase } from './game/monster.handler.js';
-import { towerAttack } from './game/towerAttack.handler.js';
+import { towerAttack, towerBuy } from './game/tower.handler.js';
 import { getUserBySocket } from '../session/user.session.js';
 import { getGameSessionBySocket, removeGameSession, removeGameSessionBySocket } from '../session/game.session.js';
 import { chat } from './ui/chat.handler.js';
+import { updateScoreAndGold } from './game/score.handler.js';
 
 // 게임 매칭 시작버튼 누를 때 실행.
 const registerHandler = (io) => {
@@ -17,6 +18,10 @@ const registerHandler = (io) => {
 
     socket.on('spawnMonster', (data) => {
       notifySpawnedMonster(socket, data);
+    });
+
+    socket.on('buyTower', (data) => {
+      towerBuy(socket, data);
     });
 
     socket.on('towerAttack', (data) => {
@@ -33,6 +38,10 @@ const registerHandler = (io) => {
 
     socket.on('room_chat', (data) => {
       chat(socket, data);
+    });
+
+    socket.on('updateScoreAndGold', (data) => {
+      updateScoreAndGold(socket, data);
     });
 
     socket.on('disconnect', () => {

@@ -27,7 +27,7 @@ const messageForm = document.getElementById('messageForm');
 const messageInput = document.getElementById('messageInput');
 const NUM_OF_MONSTERS = 5; // 몬스터 개수
 // 게임 데이터
-let towerCost = 0; // 타워 구입 비용
+let towerCost = 500; // 타워 구입 비용
 let monsterSpawnInterval = 1000; // 몬스터 생성 주기
 
 // 유저 데이터
@@ -159,12 +159,15 @@ function placeNewTower() {
   if (userGold < towerCost) {
     alert('골드가 부족합니다.');
     return;
-  }
+  } else {
+    userGold -= towerCost;
+    const { x, y } = getRandomPositionNearPath(200);
+    const tower = new Tower(x, y);
+    towers.push(tower);
+    tower.draw(ctx, towerImage);
 
-  const { x, y } = getRandomPositionNearPath(200);
-  const tower = new Tower(x, y);
-  towers.push(tower);
-  tower.draw(ctx, towerImage);
+    serverSocket.emit('buyTower', {tower, towerCost});
+  }
 }
 
 // 나의기지 및 상대기지 위치보정
@@ -273,26 +276,14 @@ function initGame(myData, opponentData) {
   monsterPath = myData[1].data;
   opponentMonsterPath = opponentData[1].data;
 
-  console.log('monsterPath', monsterPath);
-  console.log('opponentMonsterPath', opponentMonsterPath);
-
   basePosition = monsterPath[monsterPath.length - 1];
   opponentBasePosition = opponentMonsterPath[opponentMonsterPath.length - 1];
-
-  console.log('basePosition', basePosition);
-  console.log('opponentBasePosition', opponentBasePosition);
 
   initialTowerCoords = myData[2].data;
   opponentInitialTowerCoords = opponentData[2].data;
 
-  console.log('initialTowerCoords', initialTowerCoords);
-  console.log('opponentInitialTowerCoords', opponentInitialTowerCoords);
-
   baseHp = myData[3].baseHp;
-  console.log('baseHp', baseHp);
-
   userGold = myData[4].data;
-  console.log('userGold', userGold);
 
   initMap(); // 맵 초기화 (배경, 몬스터 경로 그리기)
 
@@ -394,6 +385,15 @@ Promise.all([
     const { monsterIndex, monsterHp, towerIndex } = data;
     opponentTowers[towerIndex].attack(opponentMonsters[monsterIndex]);
     opponentMonsters[monsterIndex].hp = monsterHp;
+  });
+
+  // 타워 구입시 이벤트
+  serverSocket.on('buyTower', (data) => {
+    const { x, y } = data;
+    const phurchased = new Tower(x, y);
+
+    opponentTowers.push(phurchased);
+    phurchased.draw(opponentCtx, towerImage);
   });
 
   // 상대가 몬스터 처치 시 이벤트
