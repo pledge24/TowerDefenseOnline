@@ -8,7 +8,7 @@
   "author": "",
   "license": "ISC",
   "scripts": {
-    "start": "node server/server.js",
+    "start": "node src/server.js",
     "dev": "nodemon src/server.js",
     "migrate": "node src/db/migrations/createSchemas.js",
     "format": "prettier --write *.js **/*.js"

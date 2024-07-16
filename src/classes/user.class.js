@@ -26,6 +26,8 @@ class User {
     this.TowersModel = new Towers(this.PathModel, 3);
     this.state = 'playing';
   }
+
+
 }
 
 export default User;
