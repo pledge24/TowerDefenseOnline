@@ -26,6 +26,7 @@ const NUM_OF_MONSTERS = 5; // 몬스터 개수
 // 게임 데이터
 let towerCost = 0; // 타워 구입 비용
 let monsterSpawnInterval = 1000; // 몬스터 생성 주기
+let monsterInterval; // 몬스터 인터벌
 
 // 유저 데이터
 let userGold = 0; // 유저 골드
@@ -283,7 +284,7 @@ function initGame(myData, opponentData) {
 
   initMap(); // 맵 초기화 (배경, 몬스터 경로 그리기)
 
-  setInterval(spawnMonster, monsterSpawnInterval, 3000); // 설정된 몬스터 생성 주기마다 몬스터 생성
+  monsterInterval = setInterval(spawnMonster, monsterSpawnInterval, 3000); // 설정된 몬스터 생성 주기마다 몬스터 생성
   gameLoop(); // 게임 루프 최초 실행
   isInitGame = true;
 }
@@ -364,7 +365,7 @@ Promise.all([
 
   // 상대 몬스터 스폰 이벤트 수신
   serverSocket.on('spawnOpponentMonster', (monster) => {
-    // console.log("opponent(multi_game2) spawned monster");
+    console.log('opponent(multi_game2) spawned monster');
     const newMonster = new Monster(opponentMonsterPath, monsterImages, monster.level, monster.monsterNumber);
     opponentMonsters.push(newMonster);
   });
@@ -408,8 +409,9 @@ Promise.all([
     const { isWin } = data;
     const winSound = new Audio('sounds/win.wav');
     const loseSound = new Audio('sounds/lose.wav');
-    winSound.volume = 0.3;
-    loseSound.volume = 0.3;
+    winSound.volume = 0.1;
+    loseSound.volume = 0.1;
+    clearInterval(monsterInterval);
     if (isWin) {
       winSound.play().then(() => {
         alert('당신이 게임에서 승리했습니다!');

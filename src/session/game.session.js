@@ -7,25 +7,15 @@ export const addGameSession = () => {
   return session;
 };
 
-export const removeGameSession = (id) => {
-  const index = gameSessions.findIndex((session) => session.id === id);
+export const removeGameSession = (userId) => {
+  const index = gameSessions.findIndex((session) => session.users[0].id === userId || session.users[1].id === userId);
   if (index !== -1) {
-    return gameSessions.splice(index, 1)[0];
+    gameSessions.splice(index, 1);
   }
 };
 
 export const getGameSession = (userId) => {
   return gameSessions.find((session) => session.users[0].id === userId || session.users[1].id === userId);
-};
-
-export const getGameSessionByUserId = (userId) => {
-  let session;
-  gameSessions.forEach((gameSession) => {
-    if (gameSession.getUser(userId)) {
-      session = gameSession;
-    }
-  });
-  return session;
 };
 
 export const getAllGameSessions = () => {

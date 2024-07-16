@@ -365,7 +365,8 @@ Promise.all([
 
   // 상대 몬스터 스폰 이벤트 수신
   serverSocket.on('spawnOpponentMonster', (monster) => {
-    // console.log("opponent(multi_game) spawned monster");
+    console.log(serverSocket.id);
+    console.log('opponent(multi_game) spawned monster');
     const newMonster = new Monster(opponentMonsterPath, monsterImages, monster.level, monster.monsterNumber);
     opponentMonsters.push(newMonster);
   });
