@@ -1,6 +1,6 @@
 import { handleConnection, handleDisconnect, handlerEvent } from './helper.js';
 import { addUserInQueue } from '../session/matchQueue.session.js';
-import { monsterKill, notifySpawnedMonster, monsterAttackBase } from './game/monster.handler.js';
+import { removeMonster, notifySpawnedMonster, monsterAttackBase } from './game/monster.handler.js';
 import { towerAttack, towerBuy } from './game/tower.handler.js';
 import { getUserBySocket } from '../session/user.session.js';
 import { getGameSessionBySocket, removeGameSession, removeGameSessionBySocket } from '../session/game.session.js';
@@ -29,7 +29,7 @@ const registerHandler = (io) => {
     });
 
     socket.on('removeMonster', (data) => {
-      monsterKill(socket, data);
+      removeMonster(socket, data);
     });
 
     socket.on('attackBase', (data) => {
