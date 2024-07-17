@@ -6,6 +6,7 @@ export const packetNames = {
   game: {
     ClientMonster: 'game.ClientMonster',
     ClientTower: 'game.ClientTower',
+    ClientMsg: 'game.ClientMsg',
     C2S_MatchGamePayload: 'game.C2S_MatchGamePayload',
     C2S_BuyTowerPayload: 'game.C2S_BuyTowerPayload',
     C2S_SpawnMonsterPayload: 'game.C2S_SpawnMonsterPayload',
@@ -17,6 +18,7 @@ export const packetNames = {
     
     ServerTower: 'game.ServerTower',
     ServerMonster: 'game.ServerMonster',
+    ServerMsg: 'game.ServerMonster',
     S2C_BuyTowerPayload: 'game.S2C_BuyTowerPayload',
     S2C_SpawnMonsterPayload: 'game.S2C_SpawnMonsterPayload',
     S2C_SpawnOpponentMonsterPayload: 'game.S2C_SpawnOpponentMonsterPayload',
