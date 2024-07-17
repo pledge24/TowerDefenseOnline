@@ -3,7 +3,7 @@ syntax = "proto3";
 package game;
 
 // 클라이언트 Monster 정의
-enum ClientMonster {
+message ClientMonster {
   int64 monsterNumber = 1;     // 몬스터 번호 (숫자)
   int64 path = 2;              // 몬스터가 이동할 경로 (숫자)
   int64 currentIndex = 3;      // 몬스터가 이동 중인 경로의 인덱스 (숫자)
@@ -21,7 +21,7 @@ enum ClientMonster {
 }
 
 // 클라이언트 Tower 정의
-enum ClientTower {
+message ClientTower {
   int64 x = 1;                  // x 좌표 (숫자)
   int64 y = 2;                  // y 좌표 (숫자)
   int64 width = 3;              // 가로 길이 (숫자)
@@ -34,7 +34,7 @@ enum ClientTower {
 }
 
 // 클라이언트 msg 정의
-enum ClientMsg {
+message ClientMsg {
   string msg = 1;         // 메시지 (문자열)
 }
 
@@ -86,13 +86,13 @@ message C2S_RoomChatPayload {
 // 서버 emit 부분
 
 // 서버 Tower 정의
-enum ServerTower {
+message ServerTower {
   int64 x = 1;          // x 좌표
   int64 y = 2;          // y 좌표
 }
 
 // 서버 몬스터 정의
-enum ServerMonster {
+message ServerMonster {
   int64 level = 1;            // 몬스터 레벨
   int64 monsterNumber = 3;    // 몬스터 종류
   int64 hp = 3;               // 몬스터 HP
@@ -101,7 +101,7 @@ enum ServerMonster {
 }
 
 // 서버 msg 정의
-enum ServerMsg {
+message ServerMsg {
   string msg = 1;         // 메시지 (문자열)
 }
 
@@ -135,6 +135,7 @@ message S2C_DecreaseMonsterHpPayload {
   int64 monsterIndex = 1;        // 몬스터 index (숫자)
   int64 monsterHp = 2;            // 타워 index (숫자)
 }
+
 // 몬스터 HP감소 상대에게 통지 payload
 message S2C_DecreaseOpponentMonsterHpPayload {
   int64 monsterIndex = 1;       // 몬스터 index (숫자)
