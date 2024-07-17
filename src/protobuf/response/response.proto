@@ -2,9 +2,50 @@ syntax = "proto3";
 
 package response;
 
-// 공통 응답 메시지 구조
+message S2C_socket_error {
+}
+
+message S2C_client_version_mismatch {
+}
+
+message S2C_unknown_handler_id {
+}
+
+message S2C_packet_decode_error {
+}
+
+message S2C_packet_structure_mismatch {
+}
+
+message S2C_missing_fields {
+}
+
+message S2C_user_not_found {
+}
+
+message S2C_invalid_packet {
+}
+
+message S2C_invalid_sequence {
+}
+
+message S2C_game_not_found {
+}
+
 message Response {
-  uint32 success = 1;         // 성공 여부 (성공: 0, 실패: 1)
-  bytes data = 2;             // 실제 응답 데이터 (선택적 필드)
-  uint32 responseCode = 3;    // 에러 코드 (에러 코드)
+  int32 success = 1;            // 성공 여부 (성공: 0, 실패: 1)
+  int32 message = 2;            // 실제 응답 데이터 (선택적 필드)
+  int32 failCode = 3;           // 에러 코드 (에러 코드)
+  oneof payload {
+    S2C_socket_error socket_error_payload = 4;
+    S2C_client_version_mismatch client_version_mismatch_payload = 5;
+    S2C_unknown_handler_id unknown_handler_id_payload = 6;
+    S2C_packet_decode_error packet_decode_error_payload = 7;
+    S2C_packet_structure_mismatch packet_structure_mismatch_payload = 8;
+    S2C_missing_fields missing_fields_payload = 9;
+    S2C_user_not_found user_not_found_payload = 10;
+    S2C_invalid_packet invalid_packet_payload = 11;
+    S2C_invalid_sequence invalid_sequence_payload = 12;
+    S2C_game_not_found game_not_found_payload = 13;
+  }
 }

@@ -25,6 +25,10 @@ class User {
     this.TowersModel = new Towers(this.PathModel, config.game.initial.numOfInitialTowers);
     this.state = 'playing';
   }
+
+  getNextSequence() {
+    return ++this.sequence;
+  }
 }
 
 export default User;

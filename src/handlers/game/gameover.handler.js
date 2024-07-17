@@ -1,29 +1,42 @@
 import { createRecord } from '../../db/user/record.db.js';
+import CustomError from '../../error/customError.js';
+import { handleError } from '../../error/errorResponse.js';
 import { getGameSession, removeGameSession } from '../../session/game.session.js';
 import { getUserById } from '../../session/user.session.js';
 import { getFormatDate } from '../../utils/dateFormat.js';
 
 export const checkGameover = (userId, payload) => {
-  const {} = payload;
+  try {
+    const {} = payload;
 
-  const session = getGameSession(userId);
-  const users = session.getAllUsers();
-
-  const defeatUser = getUserById(userId);
-
-  if (defeatUser.BaseModel.getBaseHp(userId) !== 0) return { status: 'fail', message: 'Base is not 0 HP' };
-
-  users.forEach((user) => {
-    let data;
-    if (user.id === userId) {
-      data = { isWin: false };
-    } else {
-      data = { isWin: true };
+    const session = getGameSession(userId);
+    if (!session) {
+      throw new CustomError(ErrorCodes.GAME_NOT_FOUND, '게임 세션을 찾을 수 없습니다.');
     }
-    user.socket.emit('gameOver', data);
-  });
 
-  return { status: 'success' };
+    const users = session.getAllUsers();
+    if (!users) {
+      throw new CustomError(ErrorCodes.USER_NOT_FOUND, '유저를 찾을 수 없습니다.');
+    }
+
+    const defeatUser = getUserById(userId);
+
+    if (defeatUser.BaseModel.getBaseHp(userId) !== 0) return { status: 'fail', message: 'Base is not 0 HP' };
+
+    users.forEach((user) => {
+      let data;
+      if (user.id === userId) {
+        data = { isWin: false };
+      } else {
+        data = { isWin: true };
+      }
+      user.socket.emit('gameOver', data);
+    });
+
+    return { status: 'success' };
+  } catch (error) {
+    handleError(socket, error);
+  }
 };
 
 export const setRecord = (userId, payload) => {
