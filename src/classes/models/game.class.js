@@ -43,12 +43,23 @@ class Game {
     });
     this.startTime = getFormatDate(new Date());
 
-    const user1_data = [this.users[0].id, this.users[0].PathModel, this.users[0].TowersModel, this.users[0].BaseModel, this.users[0].GoldModel];
-    const user2_data = [this.users[1].id, this.users[1].PathModel, this.users[1].TowersModel, this.users[1].BaseModel, this.users[1].GoldModel];
-    //console.log("user1_data", user1_data);
-    //console.log("user2_data", user2_data);
-    // user1.socket.emit("matchFound", JSON.parse(JSON.stringify(user2)));
-    // user2.socket.emit("matchFound", JSON.parse(JSON.stringify(user1)));
+    const user1_data = {
+      id: this.users[0].id, 
+      socketId: this.users[0].socket.id,
+      path: this.users[0].PathModel, 
+      towers: this.users[0].TowersModel, 
+      base: this.users[0].BaseModel, 
+      gold: this.users[0].GoldModel
+    };
+    const user2_data = {
+      id: this.users[1].id, 
+      socketId: this.users[1].socket.id,
+      path: this.users[1].PathModel, 
+      towers: this.users[1].TowersModel, 
+      base: this.users[1].BaseModel, 
+      gold: this.users[1].GoldModel
+    }
+
     // 각 유저 클라이언트로 데이터 전송.
     this.users.forEach((user) => {
       user.socket.emit('matchFound', {

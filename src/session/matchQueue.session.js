@@ -3,11 +3,8 @@ import { matchQueue } from './sessions.js';
 import { getUserBySocket } from './user.session.js';
 
 export const addUserInQueue = (socket, data) => {
-  //console.log("width, height: ", data.width, data.height);
-  console.log(socket);
   const user = getUserBySocket(socket);
   user.canvas = {width: data.width, height: data.height};
-  // console.log("user", user);
   matchQueue.push(user);
 
   // 매치 큐에 2명 이상 있다면, 큐에서 두 유저를 삭제하고, 새로운 게임 세션에 두 유저를 추가한다.

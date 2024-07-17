@@ -1,0 +1,13 @@
+{
+  "name": "level",
+  "version": "1.0.0",
+  "data": [
+    { "id":  1000, "minScore": 0 },
+    { "id":  1001, "minScore": 2000 },
+    { "id":  1002, "minScore": 4000 },
+    { "id":  1003, "minScore": 6000 },
+    { "id":  1004, "minScore": 8000 },
+    { "id":  1005, "minScore": 10000 },
+    { "id":  1006, "minScore": 12000 }
+  ]
+}

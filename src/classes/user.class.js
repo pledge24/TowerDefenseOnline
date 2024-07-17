@@ -5,6 +5,7 @@ import Score from './models/score.class.js';
 import Stage from './models/stage.class.js';
 import Towers from './models/tower.class.js';
 import Path from './models/path.class.js';
+import { config } from '../config/config.js';
 
 class User {
   // 매칭 전 실행
@@ -17,17 +18,15 @@ class User {
 
   // 매칭 후 실행.
   gameStartInitialization() {
-    this.BaseModel = new Base(500);
-    this.GoldModel = new Gold(3000);
-    this.MonstersModel = new Monsters();
-    this.ScoreModel = new Score(0);
-    this.StageModel = new Stage();
+    this.BaseModel = new Base(config.game.initial.baseHp);
+    this.GoldModel = new Gold(config.game.initial.userGold);
+    this.MonstersModel = new Monsters(config.game.initial.monsterLevel);
+    this.ScoreModel = new Score(config.game.initial.score);
+    //this.StageModel = new Stage();
     this.PathModel = new Path(this.canvas);
-    this.TowersModel = new Towers(this.PathModel, 3);
+    this.TowersModel = new Towers(this.PathModel, config.game.initial.numOfInitialTowers);
     this.state = 'playing';
   }
-
-
 }
 
 export default User;

@@ -272,19 +272,20 @@ function initGame(myData, opponentData) {
   document.getElementById('chatting-container').style.display = 'flex';
   document.getElementById('messageForm').style.display = 'flex';
 
-  userId = myData[0];
+  // 나와 상대의 데이터 초기화.
+  userId = myData.id;
 
-  monsterPath = myData[1].data;
-  opponentMonsterPath = opponentData[1].data;
+  monsterPath = myData.path.data;
+  opponentMonsterPath = opponentData.path.data;
 
   basePosition = monsterPath[monsterPath.length - 1];
   opponentBasePosition = opponentMonsterPath[opponentMonsterPath.length - 1];
 
-  initialTowerCoords = myData[2].data;
-  opponentInitialTowerCoords = opponentData[2].data;
+  initialTowerCoords = myData.towers.data;
+  opponentInitialTowerCoords = opponentData.towers.data;
 
-  baseHp = myData[3].baseHp;
-  userGold = myData[4].data;
+  baseHp = myData.base.baseHp;
+  userGold = myData.gold.data;
 
   initMap(); // 맵 초기화 (배경, 몬스터 경로 그리기)
 
@@ -330,10 +331,14 @@ Promise.all([
   });
 
   serverSocket.on('matchFound', (data) => {
-    console.log('okokok', data);
-    const myData = data.user1_data;
-    const opponentData = data.user2_data;
+    
+    const myData = data.user1_data.socketId === serverSocket.id ? data.user1_data : data.user2_data;
+    const opponentData = data.user1_data.socketId !== serverSocket.id ? data.user1_data : data.user2_data;
 
+    if(opponentData){
+      console.log('matchFound is successfully process! Opponent:', opponentData.id);
+    }
+    
     // 상대가 매치되면 3초 뒤 게임 시작
     progressBarMessage.textContent = '게임이 3초 뒤에 시작됩니다.';
 
