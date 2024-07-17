@@ -1,0 +1,163 @@
+import { Tower } from "";
+
+syntax = "proto3";
+
+package game;
+
+// 클라이언트 Monster 정의
+enum ClientMonster {
+  int64 this.monsterNumber = 1;     // 몬스터 번호 (숫자)
+  int64 this.path = 2;              // 몬스터가 이동할 경로 (숫자)
+  int64 this.currentIndex = 3;      // 몬스터가 이동 중인 경로의 인덱스 (숫자)
+  float this.x = 4;                 // 몬스터의 x 좌표 (숫자(실수))
+  float this.y = 5;                 // 몬스터의 y 좌표 (숫자(실수))
+  int64 this.width = 6;             // 몬스터 이미지 가로 길이 (숫자)
+  int64 this.height = 7;            // 몬스터 이미지 세로 길이 (숫자)
+  int64 this.speed = 8;             // 몬스터의 이동 속도 (숫자)
+  string this.image = 9;            // 몬스터 이미지 (숫자)
+  int64 this.level = 10;            // 몬스터 레벨 (숫자)
+  int64 this.maxHp = 11;            // 몬스터의 현재 HP (숫자)
+  int64 this.hp = 12;               // 몬스터의 현재 HP (숫자)
+  int64 this.attackPower = 13;      // 몬스터 공격력 (숫자)
+  int64 this.score = 14;            // 몬스터 점수 보상 (숫자)
+}
+
+// 클라이언트 Tower 정의
+enum ClientTower {
+  int64 x = 1;                  // x 좌표 (숫자)
+  int64 y = 2;                  // y 좌표 (숫자)
+  int64 width = 3;              // 가로 길이 (숫자)
+  int64 height = 4;             // 세로 길이 (숫자)
+  int64 attackPower = 5;        // 공격력 (숫자)
+  int64 range = 6;              // 사거리 (숫자)
+  int64 cooldown = 7;           // 쿨타임 (숫자)
+  int64 beamDuration = 8;       // 광선 지속시간 (숫자)
+  ClientMonster target = 9;     // 목표 (객체)
+}
+
+// 클라이언트 msg 정의
+enum ClientMsg {
+  string msg = 1;         // 메시지 (문자열)
+}
+
+// 게임 매칭 payload
+message C2S_MatchGamePayload {
+  int64 width = 1;         // 화면 가로길이 (숫자)
+  int64 height = 2;        // 화면 세로길이 (숫자)
+}
+
+// 타워 구매 payload
+message C2S_BuyTowerPayload {
+  int64 index = 1;         // index값 (특정 몬스터)
+}
+
+// 몬스터 생성 payload
+message C2S_SpawnMonsterPayload {
+  int64 monsterNumber = 1;   // 몬스터 종류 (숫자)
+}
+
+// 타워 공격 payload
+message C2S_TowerAttackPayload {
+  ClientTower tower = 1;        // 타워 (객체)
+  int64 towerIndex = 2;        // 타워 index
+  int64 monsterIndex = 2;      // 몬스터 index
+}
+
+// 몬스터 사망 payload
+message C2S_MonsterDiePayload {
+  int64 index = 1;         // 몬스터 index
+}
+
+// 기지 공격 payload
+message C2S_MonsterAttackPayload {
+  int64 index = 1;         // 몬스터 index
+}
+
+// 점수와 골드 업데이트 payload
+message C2S_UpdateScoreAndGoldPayload {
+  int64 monsterScore = 1;         // 몬스터 보상점수
+  int64 monsterIndex = 2;         // 몬스터 index
+}
+
+// 채팅 payload
+message C2S_RoomChatPayload {
+  ClientMsg msg = 1;         // 채팅 메시지 (문자열)
+}
+
+
+
+// 서버 emit 부분
+
+// 서버 Tower 정의
+enum ServerTower {
+  int64 x = 1;          // x 좌표
+  int64 y = 1;          // y 좌표
+}
+
+// 서버 몬스터 정의
+enum ServerMonster {
+  int64 level = 1;            // 몬스터 레벨
+  int64 monsterNumber = 3;    // 몬스터 종류
+  int64 hp = 3;               // 몬스터 HP
+  int64 power = 4;            // 몬스터 공격력
+  int64 gold = 5;             // 몬스터 현상금
+}
+
+// 서버 msg 정의
+enum ServerMsg {
+  string msg = 1;         // 메시지 (문자열)
+}
+
+// 타워 구매 상대에게 통지 payload
+message S2C_BuyTowerPayload {
+  ServerTower newTower = 1;        // 타워 (객체)
+}
+
+// 몬스터 생성 나에게 통지 payload
+message S2C_SpawnMonsterPayload {
+  ServerMonster spawnedMonster = 1;      // 몬스터 (객체)
+}
+
+// 몬스터 생성 상대에게 통지 payload
+message S2C_SpawnOpponentMonsterPayload {
+  ServerMonster spawnedMonster = 1;      // 몬스터 (객체)
+}
+
+// 몬스터 사망 상대에게 통지 payload
+message S2C_MonsterDiePayload {
+  int64 monsterIndex = 1;         // 몬스터 index (숫자)
+}
+
+// 기지HP 변경 통지 payload
+message S2C_UpdateBaseHpPayload {
+  int64 userBaseHp = 1;         // 몬스터 index (숫자)
+}
+
+// 몬스터 HP감소 나에게 통지 payload
+message S2C_DecreaseMonsterHpPayload {
+  int64 monsterIndex = 1;        // 몬스터 index (숫자)
+  int64 monsterHp = 2;            // 타워 index (숫자)
+}
+// 몬스터 HP감소 상대에게 통지 payload
+message S2C_DecreaseOpponentMonsterHpPayload {
+  int64 monsterIndex = 1;       // 몬스터 index (숫자)
+  int64 monsterHp = 2;          // 몬스터 HP (숫자)
+  int64 towerIndex = 3;         // 타워 index (숫자)
+}
+
+// 점수와 골드 업데이트 통지 payload
+message S2C_UpdateScoreAndGoldPayload {
+  int64 updatedScore = 1;         // 변경된 점수 (숫자)
+  int64 currentGold = 2;          // 변경된 골드 (숫자)
+  int64 updatedLevel = 3;         // 변경된 레벨 (숫자)
+}
+
+// 게임 종료 payload
+message S2C_GameOverPayload {
+  bool data = 1;          // 데이터 (Boolean)
+}
+
+// 채팅 payload
+message S2C_RoomChatPayload {
+  ServerMsg data = 1;          // 채팅 메시지 (문자열)
+}

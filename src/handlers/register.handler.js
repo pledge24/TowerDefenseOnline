@@ -13,6 +13,7 @@ const registerHandler = (io) => {
     handleConnection(socket);
     socket.on('event', (data) => handlerEvent(io, socket, data));
     socket.on('joinMatchQueue', (data) => {
+      
       addUserInQueue(socket, data);
     });
 

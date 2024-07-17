@@ -18,8 +18,6 @@ export const towerAttack = (socket, data) => {
   opponent.socket.emit('decreaseOpponentMonsterHp', { monsterIndex, monsterHp, towerIndex });
 
   return { status: 'success' };
-
-  
 };
 
 export const towerBuy = (socket, data) => {
