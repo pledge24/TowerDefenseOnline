@@ -4,6 +4,7 @@ import { config } from './config/config.js';
 import { createServer } from 'http';
 import loginRouter from './routes/login.router.js';
 import registerRouter from './routes/register.router.js';
+import { loadGameAssets } from './init/assets.js';
 
 const app = express();
 const server = createServer(app);
@@ -20,8 +21,17 @@ app.get('/', (req, res) => {
 
 initServer(server)
   .then(() => {
-    server.listen(config.server.port, config.server.host, () => {
-      console.log(`서버가 ${config.server.host}:${config.server.port}에서 열렸습니다`);
+    server.listen(config.server.port, config.server.host, async () => {
+      try {
+        //리소스 로딩 하는 곳(검증할 때 사용할 예정)
+        const assets = await loadGameAssets();
+        //console.log(assets);
+        console.log(`서버가 ${config.server.host}:${config.server.port}에서 열렸습니다`);
+      } catch (err) {
+        console.log('Failed to load game assets');
+      }
+
+      
     });
   })
   .catch((err) => {
