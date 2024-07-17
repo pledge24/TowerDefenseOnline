@@ -1,4 +1,5 @@
 import { getUserBySocket } from '../../session/user.session.js';
+import { getHandlerById } from '../../handlers/index.js';
 
 const updateScore = (user, data) => {
   const { monsterScore } = data;

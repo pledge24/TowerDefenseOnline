@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package response;
+
+// 공통 응답 메시지 구조
+message Response {
+  uint32 success = 1;         // 성공 여부 (성공: 0, 실패: 1)
+  bytes data = 2;             // 실제 응답 데이터 (선택적 필드)
+  uint32 responseCode = 3;    // 에러 코드 (에러 코드)
+}
