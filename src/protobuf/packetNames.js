@@ -1,11 +1,10 @@
 export const packetNames = {
   common: {
     Packet: 'common.Packet',
-    SendEvent: 'common.Packet',
+    SendEvent: 'common.SendEvent',
   },
   game: {
     ClientMonster: 'game.ClientMonster',
-    ClientTower: 'game.ClientTower',
     ClientMsg: 'game.ClientMsg',
     C2S_MatchGamePayload: 'game.C2S_MatchGamePayload',
     C2S_BuyTowerPayload: 'game.C2S_BuyTowerPayload',
