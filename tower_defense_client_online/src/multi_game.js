@@ -454,7 +454,7 @@ messageForm.addEventListener('submit', (e) => {
   if (msg) {
     const messageElement = document.createElement('div');
     messageElement.id = 'chat';
-    messageElement.textContent = msg;
+    messageElement.textContent = `[${userId}] ${msg}`;
     chat.appendChild(messageElement);
     messageInput.value = '';
     chat.scrollTop = chat.scrollHeight;
@@ -464,7 +464,7 @@ messageForm.addEventListener('submit', (e) => {
 
 const appendMessage = (content, className = 'message') => {
   const div = document.createElement('div');
-  div.id = 'chat';
+  div.id = 'enemy-chat';
   div.className = className;
   div.textContent = content;
   chat.appendChild(div);
