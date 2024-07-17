@@ -6,7 +6,7 @@ const addSpawnedMonster = (user, data) => {
   return user.MonstersModel.addMonster(monsterNumber);
 };
 
-const removeMonster = (user, data) => {
+const spliceMonster = (user, data) => {
   const monsterIndex = data;
   user.MonstersModel.removeMonster(monsterIndex);
   return monsterIndex;
@@ -30,14 +30,14 @@ export const notifySpawnedMonster = (socket, data) => {
   return { status: 'success' };
 };
 
-export const monsterKill = (socket, data) => {
+export const removeMonster = (socket, data) => {
   const user = getUserBySocket(socket);
   const gameSession = getGameSession(user.id);
   const opponent = gameSession.users[0].id === user.id ? gameSession.users[1] : gameSession.users[0];
-  const monsterIndex = removeMonster(user, data);
+  const monsterIndex = spliceMonster(user, data);
 
-  // socket.emit('monsterKill', monsterIndex);
-  opponent.socket.emit('opponentMonsterKill', monsterIndex);
+  // socket.emit('removeMonster', monsterIndex);
+  opponent.socket.emit('removeOpponentMonster', monsterIndex);
 
   return { status: 'success' };
 };
