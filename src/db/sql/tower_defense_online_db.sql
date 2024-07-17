@@ -18,11 +18,10 @@ CREATE TABLE IF NOT EXISTS UserInfo
 CREATE TABLE IF NOT EXISTS Record
 (
     record_id INT UNIQUE AUTO_INCREMENT,
-    player1_id VARCHAR(36),
-    player2_id VARCHAR(36),
-    player1_score INT,
-    player2_score INT,
-    win INT,
+    winner_id VARCHAR(36),
+    loser_id VARCHAR(36),
+    winner_score INT,
+    loser_score INT,
     start_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     end_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 )
