@@ -22,7 +22,6 @@ class User {
     this.GoldModel = new Gold(config.game.initial.userGold);
     this.MonstersModel = new Monsters(config.game.initial.monsterLevel);
     this.ScoreModel = new Score(config.game.initial.score);
-    //this.StageModel = new Stage();
     this.PathModel = new Path(this.canvas);
     this.TowersModel = new Towers(this.PathModel, config.game.initial.numOfInitialTowers);
     this.state = 'playing';
