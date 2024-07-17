@@ -58,7 +58,7 @@ message C2S_SpawnMonsterPayload {
 message C2S_TowerAttackPayload {
   ClientTower tower = 1;        // 타워 (객체)
   int64 towerIndex = 2;        // 타워 index
-  int64 monsterIndex = 2;      // 몬스터 index
+  int64 monsterIndex = 3;      // 몬스터 index
 }
 
 // 몬스터 사망 payload
@@ -94,7 +94,7 @@ message ServerTower {
 // 서버 몬스터 정의
 message ServerMonster {
   int64 level = 1;            // 몬스터 레벨
-  int64 monsterNumber = 3;    // 몬스터 종류
+  int64 monsterNumber = 2;    // 몬스터 종류
   int64 hp = 3;               // 몬스터 HP
   int64 power = 4;            // 몬스터 공격력
   int64 gold = 5;             // 몬스터 현상금
