@@ -3,8 +3,8 @@ import { getGameSession } from '../../session/game.session.js';
 import { getUserById, getUserBySocket } from '../../session/user.session.js';
 
 const decreaseMonsterHp = (user, data) => {
-  const { tower, monsterIndex } = data;
-  return user.MonstersModel.decreaseMonsterHp(monsterIndex, tower);
+  const { attackPower, monsterIndex } = data;
+  return user.MonstersModel.decreaseMonsterHp(monsterIndex, attackPower);
 };
 
 export const towerAttack = (socket, data) => {
@@ -25,7 +25,7 @@ export const towerBuy = (socket, data) => {
   const gameSession = getGameSession(user.id);
   const opponent = gameSession.users[0].id === user.id ? gameSession.users[1] : gameSession.users[0];
 
-  const {tower, towerCost} = data;
+  const {x, y, towerCost} = data;
 
   const goldNow = user.GoldModel.getGold();
   console.log('goldNow:', goldNow);
@@ -35,7 +35,6 @@ export const towerBuy = (socket, data) => {
     const newGold = goldNow - towerCost;
     user.GoldModel.setGold(newGold);
 
-    const {x, y} = tower;
     newTower = new Tower(x,y);
 
     user.TowersModel.addTower(newTower);

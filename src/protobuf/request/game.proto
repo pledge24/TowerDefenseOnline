@@ -20,19 +20,6 @@ message ClientMonster {
   int64 score = 14;            // 몬스터 점수 보상 (숫자)
 }
 
-// 클라이언트 Tower 정의
-message ClientTower {
-  int64 x = 1;                  // x 좌표 (숫자)
-  int64 y = 2;                  // y 좌표 (숫자)
-  int64 width = 3;              // 가로 길이 (숫자)
-  int64 height = 4;             // 세로 길이 (숫자)
-  int64 attackPower = 5;        // 공격력 (숫자)
-  int64 range = 6;              // 사거리 (숫자)
-  int64 cooldown = 7;           // 쿨타임 (숫자)
-  int64 beamDuration = 8;       // 광선 지속시간 (숫자)
-  ClientMonster target = 9;     // 목표 (객체)
-}
-
 // 클라이언트 msg 정의
 message ClientMsg {
   string msg = 1;         // 메시지 (문자열)
@@ -46,7 +33,9 @@ message C2S_MatchGamePayload {
 
 // 타워 구매 payload
 message C2S_BuyTowerPayload {
-  int64 index = 1;         // index값 (특정 몬스터)
+  int64 x = 1;            // 타워 x좌표 (숫자)
+  int64 y = 2;            // 타워 y좌표 (숫자)
+  int64 towerCost = 3;        // 타워 가격 (숫자)
 }
 
 // 몬스터 생성 payload
@@ -56,7 +45,7 @@ message C2S_SpawnMonsterPayload {
 
 // 타워 공격 payload
 message C2S_TowerAttackPayload {
-  ClientTower tower = 1;        // 타워 (객체)
+  int64 attackPower = 1;        // 타워 (객체)
   int64 towerIndex = 2;        // 타워 index
   int64 monsterIndex = 3;      // 몬스터 index
 }

@@ -168,7 +168,7 @@ function placeNewTower() {
     towers.push(tower);
     tower.draw(ctx, towerImage);
 
-    serverSocket.emit('buyTower', { tower, towerCost });
+    serverSocket.emit('buyTower', { x: tower.x, y: tower.y, towerCost });
   }
 }
 
@@ -211,7 +211,7 @@ function gameLoop() {
       const distance = Math.sqrt(Math.pow(tower.x - monster.x, 2) + Math.pow(tower.y - monster.y, 2));
       if (distance < tower.range && tower.cooldown === 0) {
         tower.attack(monster);
-        serverSocket.emit('towerAttack', { tower, towerIndex, monsterIndex });
+        serverSocket.emit('towerAttack', { attackPower: tower.attackPower, towerIndex, monsterIndex });
       }
     });
   });

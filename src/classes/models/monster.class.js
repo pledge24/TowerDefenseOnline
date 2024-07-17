@@ -58,9 +58,10 @@ class Monsters {
     return this.data.splice(monsterIdx, 1)[0];
   }
 
-  decreaseMonsterHp(index, tower) {
+  // 몬스터 HP 감소
+  decreaseMonsterHp(index, attackPower) {
     const monster = this.data[index];
-    monster.hp -= tower.attackPower;
+    monster.hp -= attackPower;
     return monster.hp;
   }
 }
