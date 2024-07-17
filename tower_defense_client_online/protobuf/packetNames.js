@@ -14,7 +14,7 @@ export const packetNames = {
     C2S_MonsterAttackPayload: 'game.C2S_MonsterAttackPayload',
     C2S_UpdateScoreAndGoldPayload: 'game.C2S_UpdateScoreAndGoldPayload',
     C2S_RoomChatPayload: 'game.C2S_RoomChatPayload',
-
+    
     ServerTower: 'game.ServerTower',
     ServerMonster: 'game.ServerMonster',
     ServerMsg: 'game.ServerMonster',
@@ -28,7 +28,5 @@ export const packetNames = {
     S2C_UpdateScoreAndGoldPayload: 'game.S2C_UpdateScoreAndGoldPayload',
     S2C_GameOverPayload: 'game.S2C_GameOverPayload',
     S2C_RoomChatPayload: 'game.S2C_RoomChatPayload',
-
-    response: 'response.Response',
   },
 };

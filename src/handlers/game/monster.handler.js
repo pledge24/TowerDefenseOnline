@@ -1,5 +1,6 @@
 import { getGameSession } from '../../session/game.session.js';
 import { getUserBySocket } from '../../session/user.session.js';
+import { getHandlerById } from '../../handlers/index.js';
 
 const addSpawnedMonster = (user, data) => {
   const { monsterNumber } = data;
