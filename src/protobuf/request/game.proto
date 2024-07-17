@@ -85,7 +85,6 @@ message C2S_RoomChatPayload {
 }
 
 
-
 // 서버 emit 부분
 
 // 서버 Tower 정의
