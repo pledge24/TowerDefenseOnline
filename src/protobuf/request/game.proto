@@ -1,25 +1,23 @@
-import { Tower } from "";
-
 syntax = "proto3";
 
 package game;
 
 // 클라이언트 Monster 정의
 enum ClientMonster {
-  int64 this.monsterNumber = 1;     // 몬스터 번호 (숫자)
-  int64 this.path = 2;              // 몬스터가 이동할 경로 (숫자)
-  int64 this.currentIndex = 3;      // 몬스터가 이동 중인 경로의 인덱스 (숫자)
-  float this.x = 4;                 // 몬스터의 x 좌표 (숫자(실수))
-  float this.y = 5;                 // 몬스터의 y 좌표 (숫자(실수))
-  int64 this.width = 6;             // 몬스터 이미지 가로 길이 (숫자)
-  int64 this.height = 7;            // 몬스터 이미지 세로 길이 (숫자)
-  int64 this.speed = 8;             // 몬스터의 이동 속도 (숫자)
-  string this.image = 9;            // 몬스터 이미지 (숫자)
-  int64 this.level = 10;            // 몬스터 레벨 (숫자)
-  int64 this.maxHp = 11;            // 몬스터의 현재 HP (숫자)
-  int64 this.hp = 12;               // 몬스터의 현재 HP (숫자)
-  int64 this.attackPower = 13;      // 몬스터 공격력 (숫자)
-  int64 this.score = 14;            // 몬스터 점수 보상 (숫자)
+  int64 monsterNumber = 1;     // 몬스터 번호 (숫자)
+  int64 path = 2;              // 몬스터가 이동할 경로 (숫자)
+  int64 currentIndex = 3;      // 몬스터가 이동 중인 경로의 인덱스 (숫자)
+  float x = 4;                 // 몬스터의 x 좌표 (숫자(실수))
+  float y = 5;                 // 몬스터의 y 좌표 (숫자(실수))
+  int64 width = 6;             // 몬스터 이미지 가로 길이 (숫자)
+  int64 height = 7;            // 몬스터 이미지 세로 길이 (숫자)
+  int64 speed = 8;             // 몬스터의 이동 속도 (숫자)
+  string image = 9;            // 몬스터 이미지 (숫자)
+  int64 level = 10;            // 몬스터 레벨 (숫자)
+  int64 maxHp = 11;            // 몬스터의 현재 HP (숫자)
+  int64 hp = 12;               // 몬스터의 현재 HP (숫자)
+  int64 attackPower = 13;      // 몬스터 공격력 (숫자)
+  int64 score = 14;            // 몬스터 점수 보상 (숫자)
 }
 
 // 클라이언트 Tower 정의
