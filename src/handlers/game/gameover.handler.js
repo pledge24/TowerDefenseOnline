@@ -27,11 +27,11 @@ export const checkGameover = (userId, payload) => {
 };
 
 export const setRecord = (userId, payload) => {
-  //data = [player1_id, player2_id, player1_score, player2_score, win, start_time]
+  //data = [winner_id, loser_id, winner_score, loser_score, start_time, end_time]
   const { isWin } = payload;
 
   if (isWin === false) {
-    return { status: 'success but lose' };
+    return { status: 'success but no record for loser XD' };
   }
 
   const data = [];
@@ -40,24 +40,22 @@ export const setRecord = (userId, payload) => {
   const users = session.getAllUsers();
 
   if (userId === users[0].id) {
-    data.push(users[1].id);
     data.push(users[0].id);
-    data.push(users[1].score);
-    data.push(users[0].score);
-    data.push(isWin);
+    data.push(users[1].id);
+    data.push(users[0].ScoreModel.getScore());
+    data.push(users[1].ScoreModel.getScore());
     data.push(session.startTime);
     data.push(getFormatDate(new Date()));
   } else {
-    data.push(users[0].id);
     data.push(users[1].id);
-    data.push(users[0].score);
-    data.push(users[1].score);
-    data.push(isWin);
+    data.push(users[0].id);
+    data.push(users[1].ScoreModel.getScore());
+    data.push(users[0].ScoreModel.getScore());
     data.push(session.startTime);
     data.push(getFormatDate(new Date()));
   }
 
-  //createRecord(data);
+  createRecord(data);
 
   removeGameSession(userId);
 

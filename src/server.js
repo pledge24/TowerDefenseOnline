@@ -20,7 +20,7 @@ app.get('/', (req, res) => {
 
 initServer(server)
   .then(() => {
-    server.listen(config.server.port, config.server.host, () => {
+    server.listen(config.server.port, config.server.host, async () => {
       console.log(`서버가 ${config.server.host}:${config.server.port}에서 열렸습니다`);
     });
   })

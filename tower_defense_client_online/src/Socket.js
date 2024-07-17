@@ -1,5 +1,5 @@
 import { CLIENT_VERSION } from './Constants.js';
-const id = 'user2'
+const id = 'user2';
 
 class Socket {
   socket = null;
@@ -14,21 +14,11 @@ class Socket {
       },
     });
 
-
-    this.socket.on('room_chat', (data) => {
-      appendMessage([${data.room}][${data.username}] ${data.msg});
-  });
-
-  this.socket.on('rooms', (rooms) => {
-      appendMessage(You are in rooms: ${rooms.join(', ')}, 'system');
-  });
-
-
     this.socket.on('response', (data) => {
       if (data.status === 'fail') {
         console.error(data);
       } else {
-        console.log("data", data);
+        console.log('data', data);
       }
     });
 
@@ -50,7 +40,7 @@ class Socket {
   }
 
   getId() {
-    console.log("this.userId", this.userId);
+    console.log('this.userId', this.userId);
     return this.userId;
   }
 

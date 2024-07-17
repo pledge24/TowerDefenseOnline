@@ -1,10 +1,10 @@
 import { Monster } from '../monster.js';
 
 class Monsters {
-  constructor() {
+  constructor(initialLevel) {
     this.data = [];
     this.monsterKillCount = 0;
-    this.currentLevel = 1;
+    this.currentLevel = initialLevel;
   }
 
   // 몬스터가 죽었을 때 횟수 증가

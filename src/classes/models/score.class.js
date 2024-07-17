@@ -18,7 +18,6 @@ class Score {
     this.data += score;
     return this.data;
   }
-
 }
 
 export default Score;
