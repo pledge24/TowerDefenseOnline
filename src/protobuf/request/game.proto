@@ -91,7 +91,7 @@ message C2S_RoomChatPayload {
 // 서버 Tower 정의
 enum ServerTower {
   int64 x = 1;          // x 좌표
-  int64 y = 1;          // y 좌표
+  int64 y = 2;          // y 좌표
 }
 
 // 서버 몬스터 정의
