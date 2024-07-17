@@ -231,12 +231,12 @@ function gameLoop() {
         // TODO. 몬스터가 기지를 공격했을 때 서버로 이벤트 전송
         monsters.splice(i, 1);
         serverSocket.emit('attackBase', i);
-        serverSocket.emit('monsterKill', i);
+        serverSocket.emit('removeMonster', i);
       }
     } else {
       // TODO. 몬스터 사망 이벤트 전송
       monsters.splice(i, 1);
-      serverSocket.emit('monsterKill', i);
+      serverSocket.emit('removeMonster', i);
       serverSocket.emit('updateScoreAndGold', { monsterScore: monster.score, monsterIndex: i });
     }
   }
@@ -397,7 +397,7 @@ Promise.all([
   });
 
   // 상대가 몬스터 처치 시 이벤트
-  serverSocket.on('opponentMonsterKill', (data) => {
+  serverSocket.on('removeOpponentMonster', (data) => {
     const monsterIndex = data;
     opponentMonsters.splice(monsterIndex, 1);
   });

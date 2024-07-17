@@ -37,7 +37,7 @@ export const monsterKill = (socket, data) => {
   const monsterIndex = removeMonster(user, data);
 
   // socket.emit('monsterKill', monsterIndex);
-  opponent.socket.emit('opponentMonsterKill', monsterIndex);
+  opponent.socket.emit('removeOpponentMonster', monsterIndex);
 
   return { status: 'success' };
 };

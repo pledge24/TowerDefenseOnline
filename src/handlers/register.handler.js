@@ -28,7 +28,7 @@ const registerHandler = (io) => {
       towerAttack(socket, data);
     });
 
-    socket.on('monsterKill', (data) => {
+    socket.on('removeMonster', (data) => {
       monsterKill(socket, data);
     });
 
