@@ -401,6 +401,7 @@ Promise.all([
         progressBarContainer.style.display = 'none';
         progressBar.style.display = 'none';
         buyTowerButton.style.display = 'block';
+        refundTowerButton.style.display = 'block';
         canvas.style.display = 'block';
         opponentCanvas.style.display = 'block';
 
@@ -536,7 +537,7 @@ const buyTowerButton = document.createElement('button');
 buyTowerButton.textContent = '타워 구입';
 buyTowerButton.style.position = 'absolute';
 buyTowerButton.style.top = '10px';
-buyTowerButton.style.right = '150px';
+buyTowerButton.style.right = '140px';
 buyTowerButton.style.padding = '10px 20px';
 buyTowerButton.style.fontSize = '16px';
 buyTowerButton.style.cursor = 'pointer';
