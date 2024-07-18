@@ -2,7 +2,6 @@ import Base from './models/base.class.js';
 import Gold from './models/gold.class.js';
 import Monsters from './models/monster.class.js';
 import Score from './models/score.class.js';
-import Stage from './models/stage.class.js';
 import Towers from './models/tower.class.js';
 import Path from './models/path.class.js';
 import { config } from '../config/config.js';
