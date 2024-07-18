@@ -1,4 +1,4 @@
-import { createUser, findUserByUserID } from '../db/user/user.db.js';
+import { createUser, createUserInfo, findUserByUserID } from '../db/user/user.db.js';
 import express from 'express';
 import bcrypt from 'bcrypt';
 
@@ -28,9 +28,11 @@ router.post('/', async (req, res, next) => {
     }
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    console.log("hashedPassword", hashedPassword);
     // 유저 생성
     const user = await createUser(username, hashedPassword);
+    console.log(user);
+    const userInfo = await createUserInfo(username, 0, 0, 0);
+    console.log(userInfo);
     return res.status(201).json({ message: '회원가입이 완료되었습니다.' });
   } catch (err) {
     return res.status(500).json({ err });

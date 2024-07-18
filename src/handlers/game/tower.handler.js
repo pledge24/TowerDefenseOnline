@@ -18,8 +18,6 @@ export const towerAttack = (socket, data) => {
   opponent.socket.emit('decreaseOpponentMonsterHp', { monsterIndex, monsterHp, towerIndex });
 
   return { status: 'success', message: 'towerAttack' };
-
-  
 };
 
 export const towerBuy = (socket, data) => {
@@ -27,18 +25,18 @@ export const towerBuy = (socket, data) => {
   const gameSession = getGameSession(user.id);
   const opponent = gameSession.users[0].id === user.id ? gameSession.users[1] : gameSession.users[0];
 
-  const {tower, towerCost} = data;
+  const { tower, towerCost } = data;
 
   const goldNow = user.GoldModel.getGold();
-  console.log('goldNow:', goldNow);
+  //console.log('goldNow:', goldNow);
   let newTower;
 
   if (goldNow >= towerCost) {
     const newGold = goldNow - towerCost;
     user.GoldModel.setGold(newGold);
 
-    const {x, y} = tower;
-    newTower = new Tower(x,y);
+    const { x, y } = tower;
+    newTower = new Tower(x, y);
 
     user.TowersModel.addTower(newTower);
   } else {
@@ -47,14 +45,14 @@ export const towerBuy = (socket, data) => {
 
   opponent.socket.emit('buyTower', newTower);
   return { status: 'success', message: 'towerBuy' };
-}
+};
 
 export const towerRefund = (socket, data) => {
   const user = getUserBySocket(socket);
   const gameSession = getGameSession(user.id);
   const opponent = gameSession.users[0].id === user.id ? gameSession.users[1] : gameSession.users[0];
-  
-  const {towerIndex, towerPos} = data;
+
+  const { towerIndex, towerPos } = data;
   const tower = user.TowersModel.getTower(towerIndex);
 
   // 해당 index의 타워가 존재하는지 체크
@@ -65,10 +63,10 @@ export const towerRefund = (socket, data) => {
   if (tower.x !== towerPos.x || tower.y !== towerPos.y) {
     return { status: 'fail', message: 'Position is Not Matching' };
   }
-  
+
   user.TowersModel.removeTower(towerIndex);
   user.GoldModel.addGold(250);
-  
+
   // 업데이트된 게임 상태를 클라이언트에 전송
   const goldNow = user.GoldModel.getGold();
   socket.emit('refundTower', {
@@ -79,6 +77,6 @@ export const towerRefund = (socket, data) => {
     updateGold: goldNow,
     index: towerIndex,
   });
-  
+
   return { status: 'success', message: 'towerRefund' };
-}
+};
