@@ -275,7 +275,7 @@ function gameLoop() {
 
   // 타워 그리기 및 몬스터 공격 처리
   towers.forEach((tower, towerIndex) => {
-    tower.draw(ctx, towerImage);
+    tower.draw(ctx, tower.isUpgraded ? upgradeTowerImage : towerImage);
     tower.updateCooldown();
     monsters.forEach((monster, monsterIndex) => {
       const distance = Math.sqrt(Math.pow(tower.x - monster.x, 2) + Math.pow(tower.y - monster.y, 2));
