@@ -3,7 +3,6 @@ import { testAllConnections } from '../utils/db/testConnection.js';
 import initSocket from './socket.js';
 
 const initServer = async (server) => {
-
   // DB연동 테스트
   try {
     await testAllConnections(pools);

@@ -56,8 +56,8 @@ const opponentMonsters = []; // 상대방 몬스터 목록
 const opponentTowers = []; // 상대방 타워 목록
 
 let isInitGame = false;
-let isRefund = false;     // 환불모드 체크
-let isUpgrade = false;     // 업그레이드 모드 체크
+let isRefund = false; // 환불모드 체크
+let isUpgrade = false; // 업그레이드 모드 체크
 
 let baseX; // 기지 x좌표 보정좌표
 let opponentBaseX; // 적 기지 x좌표 보정좌표
@@ -181,10 +181,9 @@ function placeNewTower() {
 
 // 타워 판매
 function refundTower() {
-  if(isRefund){
+  if (isRefund) {
     isRefund = false;
-  }
-  else{
+  } else {
     isRefund = true;
     isUpgrade = false;
   }
@@ -192,10 +191,9 @@ function refundTower() {
 
 // 타워 업그레이드
 function upgradeTower() {
-  if(isUpgrade){
+  if (isUpgrade) {
     isUpgrade = false;
-  }
-  else{
+  } else {
     isUpgrade = true;
     isRefund = false;
   }
@@ -220,16 +218,16 @@ canvas.addEventListener('click', (event) => {
 
     if (deltaX <= towerRangeX && deltaY <= towerRangeY && isRefund) {
       towers.splice(i, 1);
-      serverSocket.emit('refundTower', {towerIndex : i, towerPos: {x : tower.x , y : tower.y}});
+      serverSocket.emit('refundTower', { towerIndex: i, towerPos: { x: tower.x, y: tower.y } });
     }
-    
-    if(deltaX <= towerRangeX && deltaY <= towerRangeY && isUpgrade) {
+
+    if (deltaX <= towerRangeX && deltaY <= towerRangeY && isUpgrade) {
       if (tower.isUpgraded) {
-        alert('이미 업그레이드가 된 타워입니다.')
+        alert('이미 업그레이드가 된 타워입니다.');
       } else if (userGold < towerUpgradeCost) {
-        alert('골드가 부족합니다.')
+        alert('골드가 부족합니다.');
       } else {
-        serverSocket.emit('upgradeTower', {tower, towerUpgradeCost});
+        serverSocket.emit('upgradeTower', { tower, towerUpgradeCost });
       }
     }
   }
@@ -266,12 +264,12 @@ function gameLoop() {
   ctx.fillStyle = 'black';
   ctx.fillText(`현재 레벨: ${monsterLevel}`, 100, 200); // 최고 기록 표시
 
-  if(isRefund){
+  if (isRefund) {
     ctx.fillStyle = 'black';
     ctx.fillText(`타워 환불 모드 ON`, 800, 150);
   }
 
-  if(isUpgrade){
+  if (isUpgrade) {
     ctx.fillStyle = 'black';
     ctx.fillText(`타워 업그레이드 모드 ON`, 800, 150);
   }
@@ -404,14 +402,13 @@ Promise.all([
   });
 
   serverSocket.on('matchFound', (data) => {
-    
     const myData = data.user1_data.socketId === serverSocket.id ? data.user1_data : data.user2_data;
     const opponentData = data.user1_data.socketId !== serverSocket.id ? data.user1_data : data.user2_data;
 
-    if(opponentData){
+    if (opponentData) {
       console.log('matchFound is successfully process! Opponent:', opponentData.id);
     }
-    
+
     // 상대가 매치되면 3초 뒤 게임 시작
     progressBarMessage.textContent = '게임이 3초 뒤에 시작됩니다.';
 
@@ -480,27 +477,30 @@ Promise.all([
   serverSocket.on('refundTower', (data) => {
     const { updateGold, index } = data;
 
-    if(index !== undefined) { opponentTowers.splice(index, 1); }
-    else { console.log('!! refund Error !!'); }
+    if (index !== undefined) {
+      opponentTowers.splice(index, 1);
+    } else {
+      console.log('!! refund Error !!');
+    }
 
     userGold += updateGold;
   });
 
   // 타워 업그레이드시 이벤트
   serverSocket.on('upgradeTower', (data) => {
-    const {tower, updateGold} = data;
+    const { tower, updateGold } = data;
     const upgradeTower = towers.find((t) => t.x === tower.x && t.y === tower.y);
     upgradeTower.isUpgraded = true;
     upgradeTower.attackPower = 60;
     upgradeTower.range = 300;
     userGold = updateGold;
-  })
+  });
 
   // 상대 타워 업그레이드시 이벤트
   serverSocket.on('upgradeOpponentTower', (data) => {
     const opponentTower = opponentTowers.find((t) => t.x === data.x && t.y === data.y);
     opponentTower.isUpgraded = true;
-  })
+  });
 
   // 상대가 몬스터 처치 시 이벤트
   serverSocket.on('removeOpponentMonster', (data) => {

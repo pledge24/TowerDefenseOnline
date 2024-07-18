@@ -1,23 +1,23 @@
-import { Base } from "./base.js";
-import { Monster } from "./monster.js";
-import { Tower } from "./tower.js";
+import { Base } from './base.js';
+import { Monster } from './monster.js';
+import { Tower } from './tower.js';
 
-if (!localStorage.getItem("token")) {
-  alert("로그인이 필요합니다.");
-  location.href = "/login";
+if (!localStorage.getItem('token')) {
+  alert('로그인이 필요합니다.');
+  location.href = '/login';
 }
 
 let serverSocket;
-const canvas = document.getElementById("gameCanvas");
-const ctx = canvas.getContext("2d");
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
 
-const opponentCanvas = document.getElementById("opponentCanvas");
-const opponentCtx = opponentCanvas.getContext("2d");
+const opponentCanvas = document.getElementById('opponentCanvas');
+const opponentCtx = opponentCanvas.getContext('2d');
 
-const progressBarContainer = document.getElementById("progressBarContainer");
-const progressBarMessage = document.getElementById("progressBarMessage");
-const progressBar = document.getElementById("progressBar");
-const loader = document.getElementsByClassName("loader")[0];
+const progressBarContainer = document.getElementById('progressBarContainer');
+const progressBarMessage = document.getElementById('progressBarMessage');
+const progressBar = document.getElementById('progressBar');
+const loader = document.getElementsByClassName('loader')[0];
 
 const NUM_OF_MONSTERS = 5; // 몬스터 개수
 // 게임 데이터
@@ -25,40 +25,40 @@ let towerCost = 0; // 타워 구입 비용
 let monsterSpawnInterval = 0; // 몬스터 생성 주기
 
 // 유저 데이터
-let userGold = 0;               // 유저 골드
-let base;                       // 기지 객체
-let baseHp = 0;                 // 기지 체력
-let monsterLevel = 0;           // 몬스터 레벨
-let monsterPath;                // 몬스터 경로
-let initialTowerCoords;         // 초기 타워 좌표
-let basePosition;               // 기지 좌표
-const monsters = [];            // 유저 몬스터 목록
-const towers = [];              // 유저 타워 목록
-let score = 0;                  // 게임 점수
-let highScore = 0;              // 기존 최고 점수
+let userGold = 0; // 유저 골드
+let base; // 기지 객체
+let baseHp = 0; // 기지 체력
+let monsterLevel = 0; // 몬스터 레벨
+let monsterPath; // 몬스터 경로
+let initialTowerCoords; // 초기 타워 좌표
+let basePosition; // 기지 좌표
+const monsters = []; // 유저 몬스터 목록
+const towers = []; // 유저 타워 목록
+let score = 0; // 게임 점수
+let highScore = 0; // 기존 최고 점수
 
 // 상대 데이터
-let opponentBase;               // 상대방 기지 객체
-let opponentMonsterPath;        // 상대방 몬스터 경로
+let opponentBase; // 상대방 기지 객체
+let opponentMonsterPath; // 상대방 몬스터 경로
 let opponentInitialTowerCoords; // 상대방 초기 타워 좌표
-let opponentBasePosition;       // 상대방 기지 좌표
-const opponentMonsters = [];    // 상대방 몬스터 목록
-const opponentTowers = [];      // 상대방 타워 목록
+let opponentBasePosition; // 상대방 기지 좌표
+const opponentMonsters = []; // 상대방 몬스터 목록
+const opponentTowers = []; // 상대방 타워 목록
 
 let isInitGame = false;
 
 // 이미지 로딩 파트
 const backgroundImage = new Image();
-backgroundImage.src = "images/bg.webp";
+backgroundImage.src = 'images/bg.webp';
 
 const towerImage = new Image();
-towerImage.src = "images/tower.png";
+towerImage.src = 'images/tower.png';
 
 const baseImage = new Image();
-baseImage.src = "images/base.png";
+baseImage.src = 'images/base.png';
 
 const pathImage = new Image();
-pathImage.src = "images/path.png";
+pathImage.src = 'images/path.png';
 
 const monsterImages = [];
 for (let i = 1; i <= NUM_OF_MONSTERS; i++) {
@@ -99,15 +99,7 @@ function drawPath(path, context) {
     for (let j = gap; j < distance - gap; j += segmentLength) {
       const x = startX + Math.cos(angle) * j; // 다음 이미지 x좌표 계산(각도의 코사인 값은 x축 방향의 단위 벡터 * j를 곱하여 경로를 따라 이동한 x축 좌표를 구함)
       const y = startY + Math.sin(angle) * j; // 다음 이미지 y좌표 계산(각도의 사인 값은 y축 방향의 단위 벡터 * j를 곱하여 경로를 따라 이동한 y축 좌표를 구함)
-      drawRotatedImage(
-        pathImage,
-        x,
-        y,
-        imageWidth,
-        imageHeight,
-        angle,
-        context
-      );
+      drawRotatedImage(pathImage, x, y, imageWidth, imageHeight, angle, context);
     }
   }
 }
@@ -151,7 +143,7 @@ function placeInitialTowers(initialTowerCoords, initialTowers, context) {
 function placeNewTower() {
   // 타워를 구입할 수 있는 자원이 있을 때 타워 구입 후 랜덤 배치
   if (userGold < towerCost) {
-    alert("골드가 부족합니다.");
+    alert('골드가 부족합니다.');
     return;
   }
 
@@ -176,7 +168,7 @@ function spawnMonster() {
   monsters.push(newMonster);
 
   // TODO. 서버로 몬스터 생성 이벤트 전송
-  serverSocket.sendEvent(8, {monsterNumber: newMonster.monsterNumber})
+  serverSocket.sendEvent(8, { monsterNumber: newMonster.monsterNumber });
 }
 
 function gameLoop() {
@@ -184,14 +176,14 @@ function gameLoop() {
   ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height); // 배경 이미지 다시 그리기
   drawPath(monsterPath, ctx); // 경로 다시 그리기
 
-  ctx.font = "25px Times New Roman";
-  ctx.fillStyle = "skyblue";
+  ctx.font = '25px Times New Roman';
+  ctx.fillStyle = 'skyblue';
   ctx.fillText(`최고 기록: ${highScore}`, 100, 50); // 최고 기록 표시
-  ctx.fillStyle = "white";
+  ctx.fillStyle = 'white';
   ctx.fillText(`점수: ${score}`, 100, 100); // 현재 스코어 표시
-  ctx.fillStyle = "yellow";
+  ctx.fillStyle = 'yellow';
   ctx.fillText(`골드: ${userGold}`, 100, 150); // 골드 표시
-  ctx.fillStyle = "black";
+  ctx.fillStyle = 'black';
   ctx.fillText(`현재 레벨: ${monsterLevel}`, 100, 200); // 최고 기록 표시
 
   // 타워 그리기 및 몬스터 공격 처리
@@ -199,9 +191,7 @@ function gameLoop() {
     tower.draw(ctx, towerImage);
     tower.updateCooldown();
     monsters.forEach((monster) => {
-      const distance = Math.sqrt(
-        Math.pow(tower.x - monster.x, 2) + Math.pow(tower.y - monster.y, 2)
-      );
+      const distance = Math.sqrt(Math.pow(tower.x - monster.x, 2) + Math.pow(tower.y - monster.y, 2));
       if (distance < tower.range) {
         tower.attack(monster);
       }
@@ -216,7 +206,7 @@ function gameLoop() {
     if (monster.hp > 0) {
       const Attacked = monster.move();
       if (Attacked) {
-        const attackedSound = new Audio("sounds/attacked.wav");
+        const attackedSound = new Audio('sounds/attacked.wav');
         attackedSound.volume = 0.3;
         attackedSound.play();
         // TODO. 몬스터가 기지를 공격했을 때 서버로 이벤트 전송
@@ -229,13 +219,7 @@ function gameLoop() {
   }
 
   // 상대방 게임 화면 업데이트
-  opponentCtx.drawImage(
-    backgroundImage,
-    0,
-    0,
-    opponentCanvas.width,
-    opponentCanvas.height
-  );
+  opponentCtx.drawImage(backgroundImage, 0, 0, opponentCanvas.width, opponentCanvas.height);
   drawPath(opponentMonsterPath, opponentCtx); // 상대방 경로 다시 그리기
 
   opponentTowers.forEach((tower) => {
@@ -257,7 +241,7 @@ function initGame() {
   if (isInitGame) {
     return;
   }
-  bgm = new Audio("sounds/bgm.mp3");
+  bgm = new Audio('sounds/bgm.mp3');
   bgm.loop = true;
   bgm.volume = 0.2;
   bgm.play();
@@ -275,9 +259,7 @@ Promise.all([
   new Promise((resolve) => (towerImage.onload = resolve)),
   new Promise((resolve) => (baseImage.onload = resolve)),
   new Promise((resolve) => (pathImage.onload = resolve)),
-  ...monsterImages.map(
-    (img) => new Promise((resolve) => (img.onload = resolve))
-  ),
+  ...monsterImages.map((img) => new Promise((resolve) => (img.onload = resolve))),
 ]).then(() => {
   // serverSocket = io("http://15.165.15.118:3000", {
   //   auth: {
@@ -345,21 +327,21 @@ Promise.all([
   //   }
   // });
 
-          if (!isInitGame) {
-          initGame();
-        }
+  if (!isInitGame) {
+    initGame();
+  }
 });
 
-const buyTowerButton = document.createElement("button");
-buyTowerButton.textContent = "타워 구입";
-buyTowerButton.style.position = "absolute";
-buyTowerButton.style.top = "10px";
-buyTowerButton.style.right = "10px";
-buyTowerButton.style.padding = "10px 20px";
-buyTowerButton.style.fontSize = "16px";
-buyTowerButton.style.cursor = "pointer";
-buyTowerButton.style.display = "none";
+const buyTowerButton = document.createElement('button');
+buyTowerButton.textContent = '타워 구입';
+buyTowerButton.style.position = 'absolute';
+buyTowerButton.style.top = '10px';
+buyTowerButton.style.right = '10px';
+buyTowerButton.style.padding = '10px 20px';
+buyTowerButton.style.fontSize = '16px';
+buyTowerButton.style.cursor = 'pointer';
+buyTowerButton.style.display = 'none';
 
-buyTowerButton.addEventListener("click", placeNewTower);
+buyTowerButton.addEventListener('click', placeNewTower);
 
 document.body.appendChild(buyTowerButton);

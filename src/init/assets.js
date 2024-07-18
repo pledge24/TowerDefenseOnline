@@ -2,8 +2,8 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-const __filename = fileURLToPath(import.meta.url);  // 로컬 디렉토리 경로/tower_defense_online\src\init\assets.js
-const __dirname = path.dirname(__filename);         // 로컬 디렉토리 경로/tower_defense_online\src\init
+const __filename = fileURLToPath(import.meta.url); // 로컬 디렉토리 경로/tower_defense_online\src\init\assets.js
+const __dirname = path.dirname(__filename); // 로컬 디렉토리 경로/tower_defense_online\src\init
 const basePath = path.join(__dirname, '../../tower_defense_client_online/assets');
 
 let gameAssets = {}; // 전역함수로 선언

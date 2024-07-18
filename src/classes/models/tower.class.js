@@ -1,4 +1,4 @@
-import { Tower } from "../tower.js";
+import { Tower } from '../tower.js';
 
 class Towers {
   constructor(Path, numOfInitialTowers) {
@@ -6,7 +6,7 @@ class Towers {
     this.placeInitialTowers(Path, numOfInitialTowers);
   }
 
-  placeInitialTowers(Path, numOfInitialTowers){
+  placeInitialTowers(Path, numOfInitialTowers) {
     for (let i = 0; i < numOfInitialTowers; i++) {
       const { x, y } = Path.getRandomPositionNearPath(200);
       const tower = new Tower(x, y);
