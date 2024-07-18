@@ -20,3 +20,13 @@ export const getUserHighScore = async (userId) => {
   const [rows] = await pools.TOWER_DEFENSE_ONLINE_DB.query(SQL_QUERIES.GET_USER_HIGHSCORE, [userId]);
   return rows[0].highscore || 0;
 };
+
+export const getUserHighscoreList = async (userId) => {
+  const rows = await pools.TOWER_DEFENSE_ONLINE_DB.query(SQL_QUERIES.GET_USER_HIGHSCORE_LIST, [userId]);
+  return rows[0] || null;
+};
+
+export const getWorldRankingList = async () => {
+  const rows = await pools.TOWER_DEFENSE_ONLINE_DB.query(SQL_QUERIES.GET_WORLD_HIGHSCORE_LIST);
+  return rows[0] || null;
+};

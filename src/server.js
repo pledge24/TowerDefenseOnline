@@ -4,6 +4,7 @@ import { config } from './config/config.js';
 import { createServer } from 'http';
 import loginRouter from './routes/login.router.js';
 import registerRouter from './routes/register.router.js';
+import rankingRouter from './routes/ranking.router.js';
 import { loadGameAssets } from './init/assets.js';
 
 const app = express();
@@ -14,6 +15,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.static('tower_defense_client_online'));
 app.use('/register', [registerRouter]);
 app.use('/login', [loginRouter]);
+app.use('/rank', [rankingRouter]);
 
 app.get('/', (req, res) => {
   return res.status(200).json({ message: 'Hello World!' });
