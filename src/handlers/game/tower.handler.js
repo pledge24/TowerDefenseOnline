@@ -66,19 +66,29 @@ export const towerRefund = (socket, data) => {
     return { status: 'fail', message: 'Position is Not Matching' };
   }
   
+  const towerCost = tower.isUpgraded ? 600 : 250;
   user.TowersModel.removeTower(towerIndex);
-  user.GoldModel.addGold(250);
+  user.GoldModel.addGold(towerCost);
   
   // 업데이트된 게임 상태를 클라이언트에 전송
   const goldNow = user.GoldModel.getGold();
-  socket.emit('refundTower', {
-    updateGold: goldNow,
-    index: towerIndex,
-  });
   opponent.socket.emit('refundTower', {
     updateGold: goldNow,
     index: towerIndex,
   });
   
   return { status: 'success', message: 'towerRefund' };
+}
+
+export const upgradeTower = (socket, data) => {
+  const user = getUserBySocket(socket);
+  const gameSession = getGameSession(user.id);
+  const opponent = gameSession.users[0].id === user.id ? gameSession.users[1] : gameSession.users[0];
+
+  const {tower, towerUpgradeCost} = data;
+  user.TowersModel.upgradeTower(tower);
+  const updateGold = user.GoldModel.decreaseGold(towerUpgradeCost);
+
+  socket.emit('upgradeTower', {tower, updateGold});
+  opponent.socket.emit('upgradeOpponentTower', tower)
 }

@@ -18,6 +18,11 @@ class Gold {
       this.data += gold;
       return this.data;
     }
+
+    decreaseGold(gold) {
+      this.data -= gold;
+      return this.data;
+    }
 }
 
 export default Gold;

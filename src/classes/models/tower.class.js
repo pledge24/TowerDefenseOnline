@@ -23,12 +23,9 @@ class Towers {
   };
 
   upgradeTower = (Tower) => {
-
     const tower = this.data.find((t) => t.x === Tower.x && t.y === Tower.y);
     if (tower) {
       tower.isUpgraded = true;
-      tower.attackPower *= 1.5;
-      tower.range *= 1.2;
     }
   };
 

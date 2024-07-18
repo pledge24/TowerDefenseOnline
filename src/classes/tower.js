@@ -12,7 +12,7 @@ export class Tower {
       // this.beamDuration = 0; // 타워 광선 지속 시간
       // this.target = null; // 타워 광선의 목표
       // this.image = image;
-      // this.isUpgraded = false; // 업그레이드 여부
+      this.isUpgraded = false; // 업그레이드 여부
     }
 
 }
