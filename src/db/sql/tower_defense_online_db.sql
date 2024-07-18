@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS UserInfo
     highscore INT,
     win INT,
     lose INT,
-    FOREIGN KEY (User_id) REFERENCES User (user_id)
+    FOREIGN KEY (user_id) REFERENCES User (user_id)
 );
 
 CREATE TABLE IF NOT EXISTS Record
