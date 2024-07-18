@@ -32,8 +32,6 @@ initServer(server)
       } catch (err) {
         console.log('Failed to load game assets');
       }
-
-      
     });
   })
   .catch((err) => {

@@ -28,6 +28,7 @@ const messageInput = document.getElementById('messageInput');
 const NUM_OF_MONSTERS = 5; // 몬스터 개수
 // 게임 데이터
 let towerCost = 500; // 타워 구입 비용
+let towerUpgradeCost = 700; // 타워 업그레이드 비용
 let monsterSpawnInterval = 1000; // 몬스터 생성 주기
 
 // 유저 데이터
@@ -53,7 +54,8 @@ const opponentMonsters = []; // 상대방 몬스터 목록
 const opponentTowers = []; // 상대방 타워 목록
 
 let isInitGame = false;
-let isRefund = false;     // 환불모드 체크
+let isRefund = false; // 환불모드 체크
+let isUpgrade = false; // 업그레이드 모드 체크
 
 let baseX; // 기지 x좌표 보정좌표
 let opponentBaseX; // 적 기지 x좌표 보정좌표
@@ -64,6 +66,9 @@ backgroundImage.src = 'images/bg.webp';
 
 const towerImage = new Image();
 towerImage.src = 'images/tower.png';
+
+const upgradeTowerImage = new Image();
+upgradeTowerImage.src = 'images/upgradeTower.png';
 
 const baseImage = new Image();
 baseImage.src = 'images/base.png';
@@ -174,12 +179,21 @@ function placeNewTower() {
 
 // 타워 판매
 function refundTower() {
-  if(isRefund){
+  if (isRefund) {
     isRefund = false;
-  }
-  else{
+  } else {
     isRefund = true;
-    isupgrade = false;
+    isUpgrade = false;
+  }
+}
+
+// 타워 업그레이드
+function upgradeTower() {
+  if (isUpgrade) {
+    isUpgrade = false;
+  } else {
+    isUpgrade = true;
+    isRefund = false;
   }
 }
 
@@ -202,14 +216,18 @@ canvas.addEventListener('click', (event) => {
 
     if (deltaX <= towerRangeX && deltaY <= towerRangeY && isRefund) {
       towers.splice(i, 1);
-      serverSocket.emit('refundTower', {towerIndex : i, towerPos: {x : tower.x , y : tower.y}});
+      serverSocket.emit('refundTower', { towerIndex: i, towerPos: { x: tower.x, y: tower.y } });
     }
 
-    /*
-    else if(deltaX <= towerRangeX && deltaY <= towerRangeY && isupgrade) {
-      sendEvent(9, {towerId : tower.towerId, towerpos: {x : tower.x , y : tower.y}, level:tower.level});
+    if (deltaX <= towerRangeX && deltaY <= towerRangeY && isUpgrade) {
+      if (tower.isUpgraded) {
+        alert('이미 업그레이드가 된 타워입니다.');
+      } else if (userGold < towerUpgradeCost) {
+        alert('골드가 부족합니다.');
+      } else {
+        serverSocket.emit('upgradeTower', { tower, towerUpgradeCost });
+      }
     }
-    */
   }
 });
 
@@ -245,14 +263,19 @@ function gameLoop() {
   ctx.fillStyle = 'black';
   ctx.fillText(`현재 레벨: ${monsterLevel}`, 100, 200); // 최고 기록 표시
 
-  if(isRefund){
+  if (isRefund) {
     ctx.fillStyle = 'black';
     ctx.fillText(`타워 환불 모드 ON`, 800, 150);
   }
 
+  if (isUpgrade) {
+    ctx.fillStyle = 'black';
+    ctx.fillText(`타워 업그레이드 모드 ON`, 800, 150);
+  }
+
   // 타워 그리기 및 몬스터 공격 처리
   towers.forEach((tower, towerIndex) => {
-    tower.draw(ctx, towerImage);
+    tower.draw(ctx, tower.isUpgraded ? upgradeTowerImage : towerImage);
     tower.updateCooldown();
     monsters.forEach((monster, monsterIndex) => {
       const distance = Math.sqrt(Math.pow(tower.x - monster.x, 2) + Math.pow(tower.y - monster.y, 2));
@@ -293,7 +316,7 @@ function gameLoop() {
   drawPath(opponentMonsterPath, opponentCtx); // 상대방 경로 다시 그리기
 
   opponentTowers.forEach((tower) => {
-    tower.draw(opponentCtx, towerImage);
+    tower.draw(opponentCtx, tower.isUpgraded ? upgradeTowerImage : towerImage);
     tower.updateCooldown(); // 적 타워의 쿨다운 업데이트
   });
 
@@ -378,11 +401,10 @@ Promise.all([
   });
 
   serverSocket.on('matchFound', (data) => {
-
     const myData = data.user1_data.socketId === serverSocket.id ? data.user1_data : data.user2_data;
     const opponentData = data.user1_data.socketId !== serverSocket.id ? data.user1_data : data.user2_data;
 
-    if(opponentData){
+    if (opponentData) {
       console.log('matchFound is successfully process! Opponent:', opponentData.id);
     }
 
@@ -402,6 +424,7 @@ Promise.all([
         progressBar.style.display = 'none';
         buyTowerButton.style.display = 'block';
         refundTowerButton.style.display = 'block';
+        upgradeTowerButton.style.display = 'block';
         canvas.style.display = 'block';
         opponentCanvas.style.display = 'block';
 
@@ -453,10 +476,29 @@ Promise.all([
   serverSocket.on('refundTower', (data) => {
     const { updateGold, index } = data;
 
-    if(index !== undefined) { opponentTowers.splice(index, 1); }
-    else { console.log('!! refund Error !!'); }
+    if (index !== undefined) {
+      opponentTowers.splice(index, 1);
+    } else {
+      console.log('!! refund Error !!');
+    }
 
     userGold += updateGold;
+  });
+
+  // 타워 업그레이드시 이벤트
+  serverSocket.on('upgradeTower', (data) => {
+    const { tower, updateGold } = data;
+    const upgradeTower = towers.find((t) => t.x === tower.x && t.y === tower.y);
+    upgradeTower.isUpgraded = true;
+    upgradeTower.attackPower = 60;
+    upgradeTower.range = 300;
+    userGold = updateGold;
+  });
+
+  // 상대 타워 업그레이드시 이벤트
+  serverSocket.on('upgradeOpponentTower', (data) => {
+    const opponentTower = opponentTowers.find((t) => t.x === data.x && t.y === data.y);
+    opponentTower.isUpgraded = true;
   });
 
   // 상대가 몬스터 처치 시 이벤트
@@ -537,7 +579,7 @@ const buyTowerButton = document.createElement('button');
 buyTowerButton.textContent = '타워 구입';
 buyTowerButton.style.position = 'absolute';
 buyTowerButton.style.top = '10px';
-buyTowerButton.style.right = '140px';
+buyTowerButton.style.right = '350px';
 buyTowerButton.style.padding = '10px 20px';
 buyTowerButton.style.fontSize = '16px';
 buyTowerButton.style.cursor = 'pointer';
@@ -550,7 +592,7 @@ const refundTowerButton = document.createElement('button');
 refundTowerButton.textContent = '타워 환불';
 refundTowerButton.style.position = 'absolute';
 refundTowerButton.style.top = '10px';
-refundTowerButton.style.right = '10px';
+refundTowerButton.style.right = '220px';
 refundTowerButton.style.padding = '10px 20px';
 refundTowerButton.style.fontSize = '16px';
 refundTowerButton.style.cursor = 'pointer';
@@ -558,5 +600,18 @@ refundTowerButton.style.display = 'none';
 
 refundTowerButton.addEventListener('click', refundTower);
 document.body.appendChild(refundTowerButton);
+
+const upgradeTowerButton = document.createElement('button');
+upgradeTowerButton.textContent = '타워 업그레이드';
+upgradeTowerButton.style.position = 'absolute';
+upgradeTowerButton.style.top = '10px';
+upgradeTowerButton.style.right = '45px';
+upgradeTowerButton.style.padding = '10px 20px';
+upgradeTowerButton.style.fontSize = '16px';
+upgradeTowerButton.style.cursor = 'pointer';
+upgradeTowerButton.style.display = 'none';
+
+upgradeTowerButton.addEventListener('click', upgradeTower);
+document.body.appendChild(upgradeTowerButton);
 
 export { sendEvent };

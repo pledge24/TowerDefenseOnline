@@ -44,21 +44,21 @@ class Game {
     this.startTime = getFormatDate(new Date());
 
     const user1_data = {
-      id: this.users[0].id, 
+      id: this.users[0].id,
       socketId: this.users[0].socket.id,
-      path: this.users[0].PathModel, 
-      towers: this.users[0].TowersModel, 
-      base: this.users[0].BaseModel, 
-      gold: this.users[0].GoldModel
+      path: this.users[0].PathModel,
+      towers: this.users[0].TowersModel,
+      base: this.users[0].BaseModel,
+      gold: this.users[0].GoldModel,
     };
     const user2_data = {
-      id: this.users[1].id, 
+      id: this.users[1].id,
       socketId: this.users[1].socket.id,
-      path: this.users[1].PathModel, 
-      towers: this.users[1].TowersModel, 
-      base: this.users[1].BaseModel, 
-      gold: this.users[1].GoldModel
-    }
+      path: this.users[1].PathModel,
+      towers: this.users[1].TowersModel,
+      base: this.users[1].BaseModel,
+      gold: this.users[1].GoldModel,
+    };
 
     // 각 유저 클라이언트로 데이터 전송.
     this.users.forEach((user) => {

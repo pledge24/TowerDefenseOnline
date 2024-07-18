@@ -14,22 +14,12 @@ export class Base {
   }
 
   draw(ctx, baseImage, isOpponent = false) {
-    ctx.drawImage(
-      baseImage,
-      this.x - this.width,
-      this.y - this.height / 2,
-      this.width,
-      this.height
-    );
+    ctx.drawImage(baseImage, this.x - this.width, this.y - this.height / 2, this.width, this.height);
 
     if (!isOpponent) {
-      ctx.font = "16px Arial";
-      ctx.fillStyle = "white";
-      ctx.fillText(
-        `HP: ${this.hp}/${this.maxHp}`,
-        this.x - this.width - 5,
-        this.y - this.height / 2 - 10
-      );
+      ctx.font = '16px Arial';
+      ctx.fillStyle = 'white';
+      ctx.fillText(`HP: ${this.hp}/${this.maxHp}`, this.x - this.width - 5, this.y - this.height / 2 - 10);
     }
   }
 }

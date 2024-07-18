@@ -6,11 +6,11 @@ const router = express.Router();
 // 해당 유저 점수 랭킹 조회 API.
 router.get('/userHighscore', async (req, res) => {
   const userId = req.query.userId;
-  console.log("userId", userId);
+  console.log('userId', userId);
   try {
     const userHighscoreList = await getUserHighscoreList(userId);
 
-    console.log("userHighscoreList", userHighscoreList);
+    console.log('userHighscoreList', userHighscoreList);
 
     return res.status(200).json({ message: 'success get userHighscoreList', userHighscoreList });
   } catch (err) {
@@ -24,7 +24,7 @@ router.get('/worldRanking', async (req, res) => {
   try {
     const worldRankingList = await getWorldRankingList();
 
-    console.log("worldRankingList", worldRankingList);
+    console.log('worldRankingList', worldRankingList);
 
     return res.status(200).json({ message: 'success get worldRankingList', worldRankingList });
   } catch (err) {
