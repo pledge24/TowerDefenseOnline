@@ -25,7 +25,7 @@ router.post('/', async (req, res, next) => {
       return res.status(400).json({ errorMessage: '비밀번호는 2글자 이상이어야 합니다.' });
     }
     const user = await findUserByUserID(username);
-
+    console.log(user);
     if (!user) {
       return res.status(404).json({ errorMessage: '존재하지 않는 아이디입니다.' });
     }
@@ -43,7 +43,6 @@ router.post('/', async (req, res, next) => {
       { expiresIn: '12h' }
     );
     const data = { token: `Bearer ${token}` };
-    console.log("data.token", data.token);
     return res.status(200).json(data);
   } catch (err) {
     return res.status(500).json({ errorMessage: '서버 내부 에러가 발생했습니다.' });
