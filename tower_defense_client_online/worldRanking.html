@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="author" content="Changmin Kang" />
+  <title>내일배움캠프 Node.js 트랙 타워 디펜스 게임 온라인</title>
+  <link rel="icon" type="image/x-icon" href="/images/favicon.ico" />
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #2d2d2d;
+      color: white;
+      flex-direction: column;
+    }
+
+    #gameCanvas {
+      border: 2px solid #000;
+      display: none;
+    }
+
+    .button-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .button-container button {
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    th,
+    td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: center;
+      font-size: 30px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="button-container">
+    <h1>월드 유저 랭킹</h1>
+    <table>
+      <thead>
+        <tr>
+          <th>순위</th>
+          <th>유저 아이디</th>
+          <th>최고 점수</th>
+          <th>승리 수</th>
+          <th>패배 수</th>
+        </tr>
+      </thead>
+      <tbody id="ranking-table-body">
+      </tbody>
+    </table>
+
+    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+    <script type="module">
+      import { HOST, PORT } from './src/Constants.js';
+
+      async function loadWorldRankingData() {
+        const $tableBody = document.getElementById("ranking-table-body");
+
+        try {
+          // 서버로부터 랭킹 데이터를 가져옴
+          const res = await fetch(`http://${HOST}:${PORT}/rank/worldRanking`, {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include'
+          });
+
+          if (!res.ok) {
+            alert('월드 랭킹 데이터 조회 실패');
+            return;
+          }
+          
+          const data = await res.json();
+          const worldRankingList = data.worldRankingList; 
+
+          // worldRankingList: {userId, highscore, win, lose}
+          // console.log("worldRankingList", worldRankingList); 
+
+          // 랭킹 데이터를 테이블에 추가
+          worldRankingList.forEach((rank, index) => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                      <td>${index + 1}</td>
+                      <td>${rank.user_id}</td>
+                      <td>${rank.highscore}</td>
+                      <td>${rank.win}</td>
+                      <td>${rank.lose}</td>
+                  `;
+            $tableBody.appendChild(row);
+          });
+        } catch (error) {
+          console.error("Error fetching ranking data:", error);
+          alert('월드 랭킹 데이터를 불러오는 중 오류가 발생했습니다.');
+        }
+      }
+
+      // 페이지 로드 시 랭킹 데이터를 가져오도록 호출
+      loadWorldRankingData();
+    </script>
+
+
+</body>
+
+</html>
