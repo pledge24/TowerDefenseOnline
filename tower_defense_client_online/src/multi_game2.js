@@ -10,6 +10,7 @@ if (!localStorage.getItem('token2')) {
 
 let serverSocket;
 let canvas = document.getElementById('gameCanvas');
+canvas.height = 500;
 const ctx = canvas.getContext('2d');
 
 let opponentCanvas = document.getElementById('opponentCanvas');
@@ -23,6 +24,7 @@ const loader = document.getElementsByClassName('loader')[0];
 const chat = document.getElementById('chatting-container');
 const messageForm = document.getElementById('messageForm');
 const messageInput = document.getElementById('messageInput');
+
 const NUM_OF_MONSTERS = 5; // 몬스터 개수
 // 게임 데이터
 let towerCost = 500; // 타워 구입 비용
@@ -51,6 +53,7 @@ const opponentMonsters = []; // 상대방 몬스터 목록
 const opponentTowers = []; // 상대방 타워 목록
 
 let isInitGame = false;
+let isRefund = false;     // 환불모드 체크
 
 let baseX; // 기지 x좌표 보정좌표
 let opponentBaseX; // 적 기지 x좌표 보정좌표
@@ -152,6 +155,7 @@ function placeInitialTowers(initialTowerCoords, initialTowers, context) {
   });
 }
 
+// 타워 신규 배치
 function placeNewTower() {
   // 타워를 구입할 수 있는 자원이 있을 때 타워 구입 후 랜덤 배치
   if (userGold < towerCost) {
@@ -167,6 +171,47 @@ function placeNewTower() {
     serverSocket.emit('buyTower', { tower, towerCost });
   }
 }
+
+// 타워 판매
+function refundTower() {
+  if(isRefund){
+    isRefund = false;
+  }
+  else{
+    isRefund = true;
+    isupgrade = false;
+  }
+}
+
+//타워 클릭 이벤트
+canvas.addEventListener('click', (event) => {
+  const rect = canvas.getBoundingClientRect();
+  const clickX = event.clientX - rect.left;
+  const clickY = event.clientY - rect.top;
+  const towerRangeX = 30;
+  const towerRangeY = 30;
+
+  for (let i = 0; i < towers.length; i++) {
+    const tower = towers[i];
+
+    const towerCenterX = tower.x + tower.width / 2;
+    const towerCenterY = tower.y + tower.height / 2;
+
+    const deltaX = Math.abs(towerCenterX - clickX);
+    const deltaY = Math.abs(towerCenterY - clickY);
+
+    if (deltaX <= towerRangeX && deltaY <= towerRangeY && isRefund) {
+      towers.splice(i, 1);
+      serverSocket.emit('refundTower', {towerIndex : i, towerPos: {x : tower.x , y : tower.y}});
+    }
+
+    /*
+    else if(deltaX <= towerRangeX && deltaY <= towerRangeY && isupgrade) {
+      sendEvent(9, {towerId : tower.towerId, towerpos: {x : tower.x , y : tower.y}, level:tower.level});
+    }
+    */
+  }
+});
 
 // 나의기지 및 상대기지 위치보정
 function placeBase(position, isPlayer) {
@@ -199,6 +244,11 @@ function gameLoop() {
   ctx.fillText(`골드: ${userGold}`, 100, 150); // 골드 표시
   ctx.fillStyle = 'black';
   ctx.fillText(`현재 레벨: ${monsterLevel}`, 100, 200); // 최고 기록 표시
+
+  if(isRefund){
+    ctx.fillStyle = 'black';
+    ctx.fillText(`타워 환불 모드 ON`, 800, 150);
+  }
 
   // 타워 그리기 및 몬스터 공격 처리
   towers.forEach((tower, towerIndex) => {
@@ -398,6 +448,16 @@ Promise.all([
     phurchased.draw(opponentCtx, towerImage);
   });
 
+  // 타워 판매시 이벤트
+  serverSocket.on('refundTower', (data) => {
+    const { updateGold, index } = data;
+
+    if(index !== undefined) { opponentTowers.splice(index, 1); }
+    else { console.log('!! refund Error !!'); }
+
+    userGold += updateGold;
+  });
+
   // 상대가 몬스터 처치 시 이벤트
   serverSocket.on('removeOpponentMonster', (data) => {
     const monsterIndex = data;
@@ -476,14 +536,26 @@ const buyTowerButton = document.createElement('button');
 buyTowerButton.textContent = '타워 구입';
 buyTowerButton.style.position = 'absolute';
 buyTowerButton.style.top = '10px';
-buyTowerButton.style.right = '10px';
+buyTowerButton.style.right = '150px';
 buyTowerButton.style.padding = '10px 20px';
 buyTowerButton.style.fontSize = '16px';
 buyTowerButton.style.cursor = 'pointer';
 buyTowerButton.style.display = 'none';
 
 buyTowerButton.addEventListener('click', placeNewTower);
-
 document.body.appendChild(buyTowerButton);
+
+const refundTowerButton = document.createElement('button');
+refundTowerButton.textContent = '타워 환불';
+refundTowerButton.style.position = 'absolute';
+refundTowerButton.style.top = '10px';
+refundTowerButton.style.right = '10px';
+refundTowerButton.style.padding = '10px 20px';
+refundTowerButton.style.fontSize = '16px';
+refundTowerButton.style.cursor = 'pointer';
+refundTowerButton.style.display = 'none';
+
+refundTowerButton.addEventListener('click', refundTower);
+document.body.appendChild(refundTowerButton);
 
 export { sendEvent };
