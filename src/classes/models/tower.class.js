@@ -18,8 +18,8 @@ class Towers {
     this.data.push(Tower);
   };
 
-  removeTower = (Tower) => {
-    this.data = this.data.filter((t) => t.x !== Tower.x || t.y !== Tower.y);
+  removeTower = (index) => {
+    this.data.splice(index, 1);
   };
 
   upgradeTower = (Tower) => {
@@ -30,6 +30,10 @@ class Towers {
       tower.attackPower *= 1.5;
       tower.range *= 1.2;
     }
+  };
+
+  getTower = (index) => {
+    return this.data[index];
   };
 
   getUserTowers = () => {

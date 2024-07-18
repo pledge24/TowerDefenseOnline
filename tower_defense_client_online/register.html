@@ -43,12 +43,14 @@
       <button id="register">회원가입</button>
       <button id="back" style="margin-top: 50px">뒤로가기</button>
     </div>
-    <script>
+    <script type="module">
+      import { HOST, PORT } from './src/Constants.js';
+
       document.getElementById('register').addEventListener('click', () => {
         const username = document.getElementById('username').value;
         const password = document.getElementById('password').value;
 
-        fetch('http://127.0.0.1:3000/register', {
+        fetch(`http://${HOST}:${PORT}/register`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

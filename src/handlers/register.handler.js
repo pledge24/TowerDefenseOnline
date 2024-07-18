@@ -1,7 +1,7 @@
 import { handleConnection, handleDisconnect, handlerEvent } from './helper.js';
 import { addUserInQueue } from '../session/matchQueue.session.js';
 import { removeMonster, notifySpawnedMonster, monsterAttackBase } from './game/monster.handler.js';
-import { towerAttack, towerBuy } from './game/tower.handler.js';
+import { towerAttack, towerBuy, towerRefund } from './game/tower.handler.js';
 import { getGameSessionBySocket} from '../session/game.session.js';
 import { chat } from './ui/chat.handler.js';
 import { updateScoreAndGold } from './game/score.handler.js';
@@ -21,6 +21,10 @@ const registerHandler = (io) => {
 
     socket.on('buyTower', (data) => {
       towerBuy(socket, data);
+    });
+
+    socket.on('refundTower', (data) => {
+      towerRefund(socket, data);
     });
 
     socket.on('towerAttack', (data) => {

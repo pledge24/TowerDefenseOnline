@@ -17,7 +17,7 @@ export const towerAttack = (socket, data) => {
   socket.emit('decreaseMonsterHp', { monsterIndex, monsterHp });
   opponent.socket.emit('decreaseOpponentMonsterHp', { monsterIndex, monsterHp, towerIndex });
 
-  return { status: 'success' };
+  return { status: 'success', message: 'towerAttack' };
 };
 
 export const towerBuy = (socket, data) => {
@@ -44,5 +44,39 @@ export const towerBuy = (socket, data) => {
   }
 
   opponent.socket.emit('buyTower', newTower);
-  return { status: 'success' };
+  return { status: 'success', message: 'towerBuy' };
+};
+
+export const towerRefund = (socket, data) => {
+  const user = getUserBySocket(socket);
+  const gameSession = getGameSession(user.id);
+  const opponent = gameSession.users[0].id === user.id ? gameSession.users[1] : gameSession.users[0];
+
+  const { towerIndex, towerPos } = data;
+  const tower = user.TowersModel.getTower(towerIndex);
+
+  // 해당 index의 타워가 존재하는지 체크
+  if (!tower) {
+    return { status: 'fail', message: 'There is No Tower' };
+  }
+  // 해당 위치의 타워가 존재하는지 체크
+  if (tower.x !== towerPos.x || tower.y !== towerPos.y) {
+    return { status: 'fail', message: 'Position is Not Matching' };
+  }
+
+  user.TowersModel.removeTower(towerIndex);
+  user.GoldModel.addGold(250);
+
+  // 업데이트된 게임 상태를 클라이언트에 전송
+  const goldNow = user.GoldModel.getGold();
+  socket.emit('refundTower', {
+    updateGold: goldNow,
+    index: towerIndex,
+  });
+  opponent.socket.emit('refundTower', {
+    updateGold: goldNow,
+    index: towerIndex,
+  });
+
+  return { status: 'success', message: 'towerRefund' };
 };
