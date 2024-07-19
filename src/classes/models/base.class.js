@@ -17,7 +17,6 @@ class Base {
   getBaseHp = () => {
     return this.baseHp;
   };
-
 }
 
 export default Base;

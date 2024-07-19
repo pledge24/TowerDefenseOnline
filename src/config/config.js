@@ -28,8 +28,8 @@ export const config = {
     host: DB_HOST,
     port: DB_PORT,
   },
-  game:{
-    initial:{ 
+  game: {
+    initial: {
       baseHp: 200,
       userGold: 1000,
       monsterLevel: 1,
@@ -37,6 +37,6 @@ export const config = {
       // towerCost: 200,
       numOfInitialTowers: 3,
       monsterSpawnInterval: 1000,
-    }  
-  }
+    },
+  },
 };

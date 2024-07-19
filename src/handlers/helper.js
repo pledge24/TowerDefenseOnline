@@ -25,7 +25,6 @@ export const handlerEvent = (io, socket, data) => {
   }
   // 이벤트 트리거 확인용 출력문
   //console.log(`EVENT(${data.handlerId}) IS TRIGGERD! USER ID: ${data.userid}`);
-
   const handler = handlerMappings[data.handlerId];
   if (!handler) {
     socket.emit('response', { status: 'fail', message: 'Handler not found' });

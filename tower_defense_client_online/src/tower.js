@@ -10,6 +10,7 @@ export class Tower {
     this.cooldown = 0; // 타워 공격 쿨타임
     this.beamDuration = 0; // 타워 광선 지속 시간
     this.target = null; // 타워 광선의 목표
+    this.isUpgraded = false; // 타워 업그레이드 유무
   }
 
   draw(ctx, towerImage) {
@@ -30,7 +31,7 @@ export class Tower {
     // 타워가 타워 사정거리 내에 있는 몬스터를 공격하는 메소드이며 사정거리에 닿는지 여부는 game.js에서 확인합니다.
     if (this.cooldown <= 0) {
       // monster.hp -= this.attackPower;
-      this.cooldown = 180; // 3초 쿨타임 (초당 60프레임)
+      this.cooldown = this.isUpgraded ? 100 : 120; // 3초 쿨타임 (초당 60프레임)
       this.beamDuration = 30; // 광선 지속 시간 (0.5초)
       this.target = monster; // 광선의 목표 설정
     }
